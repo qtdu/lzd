@@ -10,9 +10,7 @@
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: center;
-    /* align-items: center; */
-    height: 100vh;
+    
     background-color: #f4f4f9;
 }
 
@@ -130,9 +128,9 @@ div.fixed {
     
 </head>
 <body>
-    <div class="fixed">
-        <h1>Tra bảng cước vận chuyển</h1>
-        <button onclick="openPopup('add')">Add Row</button>
+    <div class="fixed" onclick="openPopup('add')">
+        <h1>Cước vận chuyển</h1>
+        <!-- <button onclick="openPopup('add')">Add Row</button> -->
     </div>
     <div class="table-container">    
         <table id="dataTable" border="1" class="responsive-table">
