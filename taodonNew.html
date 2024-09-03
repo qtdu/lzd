@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chọn địa danh</title>
+    <style>
+		:root {
+			--socot: 5;
+			--socotmain: 5;
+		}
+		
+		
+		body {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Định dạng menu chính */
+        .menu {
+            position: relative; /* Để menu con có thể được định vị so với menu cha */
+            display: inline-block;
+			height: 40px;
+        }
+
+        .menu > a {
+            display: block;
+            padding: 8px 8px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .menu > a:hover {
+            background-color: #45a049;
+        }
+
+        /* Định dạng menu con */
+        .menu-content {
+            display: none;
+            position: absolute;
+            top: 100%; /* Hiển thị ngay dưới menu cha */
+            left: 0;
+            min-width: 160px;
+			width: 300px;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1; /* Đảm bảo menu con nằm trên menu cha */
+        }
+
+        .menu-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .menu-content a:hover {
+            background-color: #ddd;
+        }
+
+        /* Hiển thị menu con khi hover */
+        .menu:hover .menu-content {
+            display: block;
+        }
+		
+		.maincontent {
+			height: calc(97vh - 40px);
+			/*background-color: red;*/
+			overflow-y: auto; /* Cuộn dọc */
+		}
+		
+		.panel {
+            border: 1px solid #ddd; /* Đường viền cho panel */
+            border-radius: 8px; /* Bo tròn các góc */
+            overflow: hidden; /* Ẩn phần thừa */
+            max-width: 97vw; /* Chiều rộng tối đa */
+            /* margin: 20px auto; /* Căn giữa và thêm khoảng cách */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Tạo bóng */
+			margin-bottom: 10px;
+        }
+
+        /* CSS cho tiêu đề của panel */
+        .panel-header, .popup-header {
+            background-color: #4CAF50; /* Màu nền cho tiêu đề */
+            color: white; /* Màu chữ */
+            padding: 10px 15px; /* Khoảng cách trong */
+            font-size: 18px; /* Kích thước chữ */
+            font-weight: bold; /* Chữ đậm */
+            text-align: center; /* Căn giữa chữ */
+        }
+
+		.panel-body, #main1, #main2, #main3, #main4, #main5, #main6 {
+			background-color: #f9f9f9; /* Màu nền cho nội dung */
+            color: #333; /* Màu chữ */
+			
+			display: grid;
+            grid-template-columns: repeat(var(--socotmain), 1fr); /* 5 cột */
+			
+            gap: 5px; /* Khoảng cách giữa các ô */
+            max-height: 100vh; /* Chiều cao tối đa của vùng chứa để có thể cuộn */
+			
+            overflow-y: auto; /* Cuộn dọc */
+            padding: 10px;
+			margin-bottom: 10px;
+            /*border: 1px solid #ddd;*/
+			
+			width: 97vw;
+		}
+		
+		
+		.inputmain {
+			margin-top: 5px;
+			margin-left: 30px;
+		}
+		
+		.dvct {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr); /* 5 cột */
+			
+		}
+		
+		.highlight-container {
+            width: 65px;
+			height: 40px;
+            margin: 0px auto;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer; /* Đổi con trỏ chuột khi hover */
+            transition: background-color 0.3s ease; /* Hiệu ứng mượt khi đổi màu */
+			font-size: 13px;
+        }
+
+        .highlighted {
+            background-color: #ffeb3b; /* Màu vàng khi được highlight */
+			font-size: 13px;
+        }
+
+		#popup {
+			
+			height: 98vh; /* Chiều cao tối đa của vùng chứa để có thể cuộn */
+			width: 99vw;
+			position: absolute;
+            top: 5px;
+            left: 5px;
+			border: 1px solid #ddd; /* Đường viền cho panel */
+            border-radius: 8px; /* Bo tròn các góc */
+            overflow: hidden; /* Ẩn phần thừa */
+            
+            /* margin: 20px auto; /* Căn giữa và thêm khoảng cách */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Tạo bóng */
+			background-color: white;
+			display: none;
+			z-index: 10; /* Giá trị z-index cao hơn để thẻ này nổi lên trên */
+        }
+		
+
+		
+        #containerDiadanh {
+            display: grid;
+            grid-template-columns: repeat(var(--socot), 1fr); /* 5 cột */
+			width: 98%;
+            gap: 5px; /* Khoảng cách giữa các ô */
+            max-height: 80vh; /* Chiều cao tối đa của vùng chứa để có thể cuộn */
+			
+            overflow-y: auto; /* Cuộn dọc */
+            padding: 10px;
+            border: 1px solid #ddd;
+			background-color: white;
+			
+        }
+        .box {
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            text-align: center;
+			height: 50px;
+            cursor: pointer;
+			font-size: 14px;
+			font-weight: bold;
+        }
+        #search {
+            margin: 10px;
+            padding: 5px;
+            width: 250px;
+        }
+    </style>
+</head>
+<body>
+	<div class="menu">
+        <a href="#">Danh mục</a>
+        <div class="menu-content">
+            <a href="#">Tạo đơn hàng loại</a>
+            <a href="#">Danh sách các đơn đã tạo</a>
+            <a href="#">Chuyển đổi để massupload</a>
+        </div>
+		
+    </div>
+	<div class="menu">
+        <a href="#">Tạo đơn</a>		
+    </div>
+	<div id= "maincontent1" class="maincontent">
+		<div class="panel">
+			<div class="panel-header">Thông tin người gửi</div>
+			<div id= "main1">
+				<div>
+					<button id="sdtNGButton">...</button>
+					<label for="sdtNG">Điện thoại người gửi:</label>
+					<input type="tel" id="sdtNG" name="sdtNG" class="inputmain" placeholder="Nhập Số điện thoại">
+					
+				</div>
+				<div>
+					<button id="tenNGButton">...</button>
+					<label for="tenNG">Tên người gửi:</label>
+					<input type="text" id="tenNG" name="tenNG" class="inputmain"  placeholder="Nhập tên người gửi">
+					
+				</div>
+				<div>
+					<label for="diachiNG">Địa chỉ người gửi:</label>
+					<input type="text" id="diachiNG" name="diachiNG" class="inputmain"  placeholder="Nhập địa chỉ người gửi">
+					
+				</div>
+				<div>
+					<button id="diaphuongNGButton">...</button>
+					<label for="diaphuongNG">Địa phương người gửi:</label>
+					<input type="text" id="diaphuongNG" name="diaphuongNG" class="inputmain"  placeholder="Nhập địa phương người gửi">
+					
+				</div>
+			</div>
+		</div>
+		<div class="panel">
+			<div class="panel-header">Thông tin đơn vị thu gom</div>
+			<div id= "main2">
+				<div>
+					<button id="sdtTGButton">...</button>
+					<label for="sdtTG">Điện thoại thu gom:</label>
+					<input type="tel" id="sdtTG" name="sdtTG" class="inputmain" placeholder="Nhập Số điện thoại">
+					
+				</div>
+				<div>
+					<button id="tenTGButton">...</button>
+					<label for="tenTG">Tên người thu gom:</label>
+					<input type="text" id="tenTG" name="tenTG" class="inputmain"  placeholder="Nhập tên thu gom">
+					
+				</div>
+				<div>
+					<label for="diachiTG">Địa chỉ thu gom:</label>
+					<input type="text" id="diachiTG" name="diachiTG" class="inputmain"  placeholder="Nhập địa chỉ thu gom">
+					
+				</div>
+				<div>
+					<button id="diaphuongTGButton">...</button>
+					<label for="diaphuongTG">Địa phương thu gom:</label>
+					<input type="text" id="diaphuongTG" name="diaphuongTG" class="inputmain"  placeholder="Nhập địa phương thu gom">
+					
+				</div>
+			</div>
+		</div>
+		<div class="panel">
+			<div class="panel-header">Thông tin người nhận</div>
+			<div id= "main3">
+				<div>
+					<button id="sdtNNButton">...</button>
+					<label for="sdtNN">Điện thoại người nhận:</label>
+					<input type="tel" id="sdtNN" name="sdtNN" class="inputmain"  placeholder="Nhập Số điện thoại">
+					
+				</div>
+				<div>
+					<button id="tenNNButton">...</button>
+					<label for="tenNN">Tên người nhận:</label>
+					<input type="text" id="tenNN" name="tenNN" class="inputmain"  placeholder="Nhập tên người nhận">
+					
+				</div>
+				<div>
+					<label for="diachiNN">Địa chỉ người nhận:</label>
+					<input type="text" id="diachiNN" name="diachiNN" class="inputmain"  placeholder="Nhập địa chỉ người nhận">
+					
+				</div>
+				<div>
+					<button id="diaphuongNNButton">...</button>
+					<label for="diaphuongNN">Địa phương người nhận:</label>
+					<input type="text" id="diaphuongNN" name="diaphuongNN" class="inputmain"  placeholder="Nhập địa phương người nhận">
+					
+				</div>
+			</div>
+		</div>
+		<div class="panel">
+			<div class="panel-header">Thông tin hàng hóa</div>
+			<div id= "main4">
+				<div>
+					<button id="tenHHButton">...</button>
+					<label for="tenHH">Tên hàng hóa:</label>
+					<input type="text" id="tenHH" name="tenHH" class="inputmain"  placeholder="Nhập tên hàng hóa">
+					
+				</div>
+				<div>
+					<label for="soluongHH">Số lượng hàng hóa:</label>
+					<input type="number" id="soluongHH" name="soluongHH" class="inputmain"  placeholder="Nhập số lượng">
+					
+				</div>
+				<div>
+					<label for="tonggiatienHH">Tổng tiền hàng hóa (đồng):</label>
+					<input type="number" id="tonggiatienHH" name="tonggiatienHH" class="inputmain"  placeholder="Nhập tổng tiền hàng hóa">
+					
+				</div>
+				<div>
+					<label for="chitietHH">Chi tiết hàng hóa:</label>
+					<input type="text" id="chitietHH" name="chitietHH" class="inputmain"  placeholder="Nhập chi tiết hàng hóa">
+					
+				</div>
+			</div>
+		</div>
+		<div class="panel">
+			<div class="panel-header">Kích thước, cân nặng hàng hóa</div>
+			<div id= "main5">
+				<div>
+					<label for="cannangHH">Cân nặng của hàng hóa (kg):</label>
+					<input type="number" id="cannangHH" name="cannangHH" class="inputmain"  placeholder="Nhập cân năng">
+					
+				</div>
+				<div>
+					<label for="canh1HH">Kích thước cạnh 1 (cm):</label>
+					<input type="number" id="canh1HH" name="canh1HH" class="inputmain"  placeholder="Nhập cạnh 1">
+					
+				</div>
+				<div>
+					<label for="canh2HH">Kích thước cạnh 2 (cm):</label>
+					<input type="number" id="canh2HH" name="canh2HH" class="inputmain"  placeholder="Nhập cạnh 2">
+					
+				</div>
+				<div>
+					<label for="canh3HH">Kích thước cạnh 3 (cm):</label>
+					<input type="number" id="canh3HH" name="canh3HH" class="inputmain"  placeholder="Nhập cạnh 3">
+					
+				</div>
+			</div>
+		</div>
+		<div class="panel">
+			<div class="panel-header">Dịch vụ cộng thêm</div>
+			<div id= "main6">
+				<div class="dvct">
+					<div class="highlight-container" id="highlightDiv1">
+						Lưu kho
+					</div>
+					<div class="highlight-container" id="highlightDiv2">
+						Giao hàng 1 phần
+					</div>
+					<div class="highlight-container" id="highlightDiv3">
+						Đồng kiểm
+					</div>
+				</div>
+				
+				<div class="dvct">
+					
+					<div class="highlight-container" id="highlightDiv4">
+						Bảo hiểm
+					</div>
+					<div class="highlight-container" id="highlightDiv5">
+						
+					</div>
+					<div class="highlight-container" id="highlightDiv6">
+						
+					</div>
+					
+				</div>
+				
+				<div class="dvct">
+					<div class="highlight-container" id="highlightDiv5">
+						
+					</div>
+					<div class="highlight-container" id="highlightDiv6">
+						
+					</div>
+					<div class="highlight-container" id="highlightDiv6">
+						
+					</div>
+					
+				</div>
+				
+				<div class="dvct">
+					<div class="highlight-container" id="highlightDiv7">
+						
+					</div>
+					<div class="highlight-container" id="highlightDiv8">
+						
+					</div>
+					<div class="highlight-container" id="highlightDiv6">
+						
+					</div>
+					
+				</div>
+				
+				<div>
+					<button id="ghichuHHButton">...</button>
+					<label for="ghichuHH">Ghi chú:</label>
+					<input type="text" id="ghichuHH" name="ghichuHH" class="inputmain"  placeholder="Nhập ghi chú hàng hóa">
+					
+				</div>
+
+			</div>
+		</div>
+    </div>
+	
+	
+	<div id="popup">
+        <div class="popup-header">Nhập nhanh địa danh</div>
+        <div class="popup-body">
+            <input type="text" id="search" placeholder="Nhập từ gợi nhớ..." oninput="filterDivs()">
+			<button id="closePopup">Đóng</button>
+			<div id="containerDiadanh"></div>
+        </div>
+    </div>
+	
+    
+
+    <script>
+		
+		const _0x4d56d5=_0xb7df;function _0x14a4(){const _0x11b6a6=['ểm\x20tra\x20con','iadanh','om/repos/','38468vwZyoV','Có\x20lỗi\x20xảy','slice','div','toLowerCas','king\x20file\x20','target','applicatio','\x20file','click','/contents/','createElem','nh\x20công!','display','push','613840IALNSs','Upload\x20fai','closePopup','to\x20GitHub:','addEventLi','userAgent','documentEl','Tải\x20lên\x20th','popup','\x20ra\x20khi\x20tả','highlighte','getElement','innerHTML','main','9agcgYFpzT','p\x20vào:\x20','Error\x20uplo','io/lzd/Dia','https://qt','NButton','sole\x20để\x20bi','error','PUT','n/vnd.gith','existence:','ất\x20bại.\x20Ki','sha','forEach','5625891EFQeFk','ent','Upload\x20CSV','18ByZgyf','ết\x20chi\x20tiế','a\x20problem\x20','--socot','led:','<br>','.box','18hlVtRF','style','toggle','https://ap','length','sponse\x20was','then','test','2409560enyIdq','629335DpYEQv','value','CSV\x20đã\x20đượ','setPropert','etch\x20opera','\x20not\x20ok\x20','ub.','Error\x20chec','MuUy9cOAxn','--socotmai','testQ.csv','split','className','trim','qtdu','ById','c\x20tải\x20lên\x20','diaphuongN','stener','1291569DFGvkX','GitHub\x20thà','containerD','du.github.','join','map','torAll','GButton','token\x20','none','3wNL1aMTOZ','There\x20was\x20','3017990EnlCef','danh.csv','textConten','block','i.github.c'];_0x14a4=function(){return _0x11b6a6;};return _0x14a4();}(function(_0x1691d0,_0x557ce3){const _0x173f04=_0xb7df,_0x1d1183=_0x1691d0();while(!![]){try{const _0xf4becb=parseInt(_0x173f04(0x165))/0x1*(parseInt(_0x173f04(0x19c))/0x2)+-parseInt(_0x173f04(0x188))/0x3+parseInt(_0x173f04(0x174))/0x4+parseInt(_0x173f04(0x194))/0x5+-parseInt(_0x173f04(0x16c))/0x6*(parseInt(_0x173f04(0x175))/0x7)+parseInt(_0x173f04(0x146))/0x8+-parseInt(_0x173f04(0x162))/0x9;if(_0xf4becb===_0x557ce3)break;else _0x1d1183['push'](_0x1d1183['shift']());}catch(_0x39f56a){_0x1d1183['push'](_0x1d1183['shift']());}}}(_0x14a4,0x4a1e9),Diadanh=[]);function downloadAndProcessCSV(){const _0x35b004=_0xb7df,_0x223827=_0x35b004(0x158)+_0x35b004(0x18b)+_0x35b004(0x157)+_0x35b004(0x195);fetch(_0x223827)[_0x35b004(0x172)](_0x140e8c=>{const _0x4c665d=_0x35b004;if(!_0x140e8c['ok'])throw new Error('Network\x20re'+_0x4c665d(0x171)+_0x4c665d(0x17a)+_0x140e8c['statusText']);return _0x140e8c['text']();})[_0x35b004(0x172)](_0x3f1398=>{const _0x53d49a=csvToArray(_0x3f1398);Diadanh=convertObjectArrayTo2DArray(_0x53d49a),NapData();})['catch'](_0x43a805=>{const _0x191cec=_0x35b004;console[_0x191cec(0x15b)](_0x191cec(0x193)+_0x191cec(0x167)+'with\x20the\x20f'+_0x191cec(0x179)+'tion:',_0x43a805);});}function convertObjectArrayTo2DArray(_0x530b5a){const _0x5e2700=_0xb7df,_0x4d51d7=Object['keys'](_0x530b5a[0x0]),_0xc899a6=_0x530b5a[_0x5e2700(0x18d)](_0x5cf6f0=>_0x4d51d7[_0x5e2700(0x18d)](_0x22a78c=>_0x5cf6f0[_0x22a78c]));return _0xc899a6;}function _0xb7df(_0xfc5036,_0x1cd58f){const _0x14a40c=_0x14a4();return _0xb7df=function(_0xb7dfce,_0x471538){_0xb7dfce=_0xb7dfce-0x142;let _0x3f75be=_0x14a40c[_0xb7dfce];return _0x3f75be;},_0xb7df(_0xfc5036,_0x1cd58f);}function csvToArray(_0x2695d3){const _0x393fcd=_0xb7df,_0x1f2ba4=_0x2695d3[_0x393fcd(0x182)]()[_0x393fcd(0x180)]('\x0a'),_0x524866=_0x1f2ba4[0x0][_0x393fcd(0x180)](','),_0x251462=_0x1f2ba4[_0x393fcd(0x19e)](0x1)['map'](_0x10b727=>{const _0x4092c5=_0x393fcd,_0x47a205=_0x10b727[_0x4092c5(0x180)](','),_0xa9952f={};return _0x524866[_0x4092c5(0x161)]((_0x40b66c,_0x9d9bed)=>{const _0x1c8924=_0x4092c5;_0xa9952f[_0x40b66c[_0x1c8924(0x182)]()]=_0x47a205[_0x9d9bed][_0x1c8924(0x182)]();}),_0xa9952f;});return _0x251462;}downloadAndProcessCSV();function detectDevice(){const _0x158fdd=_0xb7df,_0x2d2ab9=navigator[_0x158fdd(0x14b)][_0x158fdd(0x1a0)+'e'](),_0x39d57d=/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i[_0x158fdd(0x173)](_0x2d2ab9);return _0x39d57d?[0x2,0x1]:[0x5,0x5];}const container=document[_0x4d56d5(0x151)+_0x4d56d5(0x184)](_0x4d56d5(0x18a)+_0x4d56d5(0x19a));function NapData(){const _0x116bd0=_0x4d56d5,_0x882b54=detectDevice();document[_0x116bd0(0x14c)+'ement'][_0x116bd0(0x16d)][_0x116bd0(0x178)+'y'](_0x116bd0(0x168),_0x882b54[0x0]),document['documentEl'+'ement'][_0x116bd0(0x16d)][_0x116bd0(0x178)+'y'](_0x116bd0(0x17e)+'n',_0x882b54[0x1]);for(let _0x53b4e2=0x0;_0x53b4e2<Diadanh[_0x116bd0(0x170)];_0x53b4e2++){const _0x82401c=document[_0x116bd0(0x142)+_0x116bd0(0x163)](_0x116bd0(0x19f));_0x82401c[_0x116bd0(0x181)]='box',_0x82401c[_0x116bd0(0x152)]=Diadanh[_0x53b4e2][0x2]+'<br>'+Diadanh[_0x53b4e2][0x1]+_0x116bd0(0x16a)+Diadanh[_0x53b4e2][0x0],_0x82401c['onclick']=()=>alert('Bạn\x20đã\x20nhấ'+_0x116bd0(0x155)+_0x82401c[_0x116bd0(0x196)+'t']),container['appendChil'+'d'](_0x82401c);}}function check(_0x2f36e9,_0x575a20,_0xc54770,_0x114ee1){timthay=0x0;for(let _0x36e1db=_0x2f36e9;_0x36e1db<_0x575a20;_0x36e1db++){text=_0xc54770[_0x36e1db]['toLowerCas'+'e']();if(text['includes'](_0x114ee1['trim']())){timthay=0x1;break;}}return timthay;}function kethopTimkiem(_0x1225f3,_0xca765d,_0x1872b0){return _0x1225f3*_0xca765d*_0x1872b0;}function filterDivs(){const _0x18e207=_0x4d56d5,_0x3ea7fe=document[_0x18e207(0x151)+_0x18e207(0x184)]('search')[_0x18e207(0x176)][_0x18e207(0x1a0)+'e'](),_0xd0548e=document['querySelec'+_0x18e207(0x18e)](_0x18e207(0x16b));searchValueArr=_0x3ea7fe[_0x18e207(0x180)]('\x20'),l=searchValueArr['length'],ketqua=[];for(let _0x240193=0x0;_0x240193<Diadanh[_0x18e207(0x170)];_0x240193++){l==0x1&&(timthay1=check(0x0,0x6,Diadanh[_0x240193],searchValueArr[0x0]),timthay=kethopTimkiem(timthay1,0x1,0x1)),l==0x2&&(timthay1=check(0x3,0x4,Diadanh[_0x240193],searchValueArr[0x0]),timthay2=check(0x4,0x5,Diadanh[_0x240193],searchValueArr[0x1]),timthay=kethopTimkiem(timthay1,timthay2,0x1),timthay==0x0&&(timthay1=check(0x3,0x4,Diadanh[_0x240193],searchValueArr[0x1]),timthay2=check(0x4,0x5,Diadanh[_0x240193],searchValueArr[0x0]),timthay=kethopTimkiem(timthay1,timthay2,0x1)),timthay==0x0&&(timthay1=check(0x3,0x4,Diadanh[_0x240193],searchValueArr[0x0]),timthay2=check(0x5,0x6,Diadanh[_0x240193],searchValueArr[0x1]),timthay=kethopTimkiem(timthay1,timthay2,0x1)),timthay==0x0&&(timthay1=check(0x3,0x4,Diadanh[_0x240193],searchValueArr[0x1]),timthay2=check(0x5,0x6,Diadanh[_0x240193],searchValueArr[0x0]),timthay=kethopTimkiem(timthay1,timthay2,0x1)),timthay==0x0&&(timthay1=check(0x4,0x5,Diadanh[_0x240193],searchValueArr[0x0]),timthay2=check(0x5,0x6,Diadanh[_0x240193],searchValueArr[0x1]),timthay=kethopTimkiem(timthay1,timthay2,0x1)),timthay==0x0&&(timthay1=check(0x4,0x5,Diadanh[_0x240193],searchValueArr[0x1]),timthay2=check(0x5,0x6,Diadanh[_0x240193],searchValueArr[0x0]),timthay=kethopTimkiem(timthay1,timthay2,0x1))),l==0x3&&(timthay1=check(0x3,0x4,Diadanh[_0x240193],searchValueArr[0x0]),timthay2=check(0x4,0x5,Diadanh[_0x240193],searchValueArr[0x1]),timthay3=check(0x5,0x6,Diadanh[_0x240193],searchValueArr[0x2]),timthay=kethopTimkiem(timthay1,timthay2,timthay3),timthay==0x0&&(timthay1=check(0x3,0x4,Diadanh[_0x240193],searchValueArr[0x0]),timthay2=check(0x4,0x5,Diadanh[_0x240193],searchValueArr[0x2]),timthay3=check(0x5,0x6,Diadanh[_0x240193],searchValueArr[0x1]),timthay=kethopTimkiem(timthay1,timthay2,timthay3)),timthay==0x0&&(timthay1=check(0x3,0x4,Diadanh[_0x240193],searchValueArr[0x1]),timthay2=check(0x4,0x5,Diadanh[_0x240193],searchValueArr[0x0]),timthay3=check(0x5,0x6,Diadanh[_0x240193],searchValueArr[0x2]),timthay=kethopTimkiem(timthay1,timthay2,timthay3)),timthay==0x0&&(timthay1=check(0x3,0x4,Diadanh[_0x240193],searchValueArr[0x1]),timthay2=check(0x4,0x5,Diadanh[_0x240193],searchValueArr[0x2]),timthay3=check(0x5,0x6,Diadanh[_0x240193],searchValueArr[0x0]),timthay=kethopTimkiem(timthay1,timthay2,timthay3)),timthay==0x0&&(timthay1=check(0x3,0x4,Diadanh[_0x240193],searchValueArr[0x2]),timthay2=check(0x4,0x5,Diadanh[_0x240193],searchValueArr[0x0]),timthay3=check(0x5,0x6,Diadanh[_0x240193],searchValueArr[0x1]),timthay=kethopTimkiem(timthay1,timthay2,timthay3)),timthay==0x0&&(timthay1=check(0x3,0x4,Diadanh[_0x240193],searchValueArr[0x2]),timthay2=check(0x4,0x5,Diadanh[_0x240193],searchValueArr[0x1]),timthay3=check(0x5,0x6,Diadanh[_0x240193],searchValueArr[0x0]),timthay=kethopTimkiem(timthay1,timthay2,timthay3))),timthay==0x1&&ketqua[_0x18e207(0x145)](_0x240193);}for(let _0x17c51b=0x0;_0x17c51b<_0xd0548e['length'];_0x17c51b++){const _0x4812b1=_0xd0548e[_0x17c51b];_0x4812b1[_0x18e207(0x16d)][_0x18e207(0x144)]=_0x18e207(0x191);}for(let _0x54efde=0x0;_0x54efde<ketqua['length'];_0x54efde++){const _0xb60689=_0xd0548e[ketqua[_0x54efde]];_0xb60689[_0x18e207(0x16d)][_0x18e207(0x144)]=_0x18e207(0x197);}}document[_0x4d56d5(0x151)+_0x4d56d5(0x184)](_0x4d56d5(0x148))['addEventLi'+'stener'](_0x4d56d5(0x1a5),function(){const _0x595ea0=_0x4d56d5;document[_0x595ea0(0x151)+_0x595ea0(0x184)](_0x595ea0(0x14e))[_0x595ea0(0x16d)]['display']=_0x595ea0(0x191);}),document[_0x4d56d5(0x151)+_0x4d56d5(0x184)]('diaphuongN'+_0x4d56d5(0x18f))[_0x4d56d5(0x14a)+_0x4d56d5(0x187)](_0x4d56d5(0x1a5),function(){const _0x494bfc=_0x4d56d5;document[_0x494bfc(0x151)+_0x494bfc(0x184)](_0x494bfc(0x14e))[_0x494bfc(0x16d)][_0x494bfc(0x144)]='block';}),document['getElement'+'ById'](_0x4d56d5(0x186)+_0x4d56d5(0x159))[_0x4d56d5(0x14a)+_0x4d56d5(0x187)](_0x4d56d5(0x1a5),function(){const _0x25b8aa=_0x4d56d5;document[_0x25b8aa(0x151)+_0x25b8aa(0x184)](_0x25b8aa(0x14e))['style'][_0x25b8aa(0x144)]=_0x25b8aa(0x197);});for(let i=0x1;i<=0x4;i++){document[_0x4d56d5(0x151)+_0x4d56d5(0x184)]('highlightD'+'iv'+i)[_0x4d56d5(0x14a)+'stener'](_0x4d56d5(0x1a5),function(_0x49f422){const _0x5be528=_0x4d56d5;_0x49f422[_0x5be528(0x1a2)]['classList'][_0x5be528(0x16e)](_0x5be528(0x150)+'d');});}function arrayToCSV(_0x48e4f0){const _0x214ee4=_0x4d56d5;return _0x48e4f0[_0x214ee4(0x18d)](_0x1326ee=>_0x1326ee[_0x214ee4(0x18c)](','))['join']('\x0a');}async function uploadCSVToGitHub(_0x21661c){const _0x4477bc=_0x4d56d5,_0x11feab='lzd',_0xb379a4=_0x4477bc(0x183),_0x498d8a=_0x4477bc(0x17f),_0xdb6a81=_0x4477bc(0x153),_0x2b96e7='ghp_lSYVf1'+_0x4477bc(0x154)+_0x4477bc(0x17d)+_0x4477bc(0x192),_0x22948b=btoa(unescape(encodeURIComponent(_0x21661c))),_0x34676a=_0x4477bc(0x16f)+_0x4477bc(0x198)+_0x4477bc(0x19b)+_0xb379a4+'/'+_0x11feab+_0x4477bc(0x1a6)+_0x498d8a+'?ref='+_0xdb6a81;let _0x3b0dc8='';try{const _0x58fe5a=await fetch(_0x34676a,{'headers':{'Authorization':_0x4477bc(0x190)+_0x2b96e7,'Accept':_0x4477bc(0x1a3)+_0x4477bc(0x15d)+'ub.v3+json'}});if(_0x58fe5a['ok']){const _0x18102c=await _0x58fe5a['json']();_0x3b0dc8=_0x18102c[_0x4477bc(0x160)];}}catch(_0xb7857a){console[_0x4477bc(0x15b)](_0x4477bc(0x17c)+_0x4477bc(0x1a1)+_0x4477bc(0x15e),_0xb7857a);}const _0x3480f0=_0x4477bc(0x16f)+'i.github.c'+_0x4477bc(0x19b)+_0xb379a4+'/'+_0x11feab+_0x4477bc(0x1a6)+_0x498d8a,_0x525ba9={'message':_0x4477bc(0x164)+_0x4477bc(0x1a4),'content':_0x22948b,'branch':_0xdb6a81};_0x3b0dc8&&(_0x525ba9[_0x4477bc(0x160)]=_0x3b0dc8);try{const _0x182d80=await fetch(_0x3480f0,{'method':_0x4477bc(0x15c),'headers':{'Authorization':'token\x20'+_0x2b96e7,'Accept':_0x4477bc(0x1a3)+_0x4477bc(0x15d)+'ub.v3+json'},'body':JSON['stringify'](_0x525ba9)});if(_0x182d80['ok'])alert(_0x4477bc(0x177)+_0x4477bc(0x185)+_0x4477bc(0x189)+_0x4477bc(0x143));else{const _0x5d6524=await _0x182d80['json']();console[_0x4477bc(0x15b)](_0x4477bc(0x147)+_0x4477bc(0x169),_0x5d6524),alert(_0x4477bc(0x14d)+_0x4477bc(0x15f)+_0x4477bc(0x199)+_0x4477bc(0x15a)+_0x4477bc(0x166)+'t.');}}catch(_0x21a312){console[_0x4477bc(0x15b)](_0x4477bc(0x156)+'ading\x20CSV\x20'+_0x4477bc(0x149),_0x21a312),alert(_0x4477bc(0x19d)+_0x4477bc(0x14f)+'i\x20lên\x20GitH'+_0x4477bc(0x17b));}}
+		
+    </script>
+</body>
+</html>
