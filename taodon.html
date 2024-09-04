@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chọn địa danh</title>
+    <style>
+		:root {
+			--socot: 5;
+			--socotmain: 5;
+		}
+		
+		body {
+            font-family: Arial, sans-serif;
+			overscroll-behavior: contain; /* Ngăn chặn hành vi kéo xuống refresh */
+            height: 97vh;
+        }
+
+        /* Định dạng menu chính */
+        .menu {
+            position: relative; /* Để menu con có thể được định vị so với menu cha */
+            display: inline-block;
+			height: 40px;
+        }
+
+        .menu > a, .menu .menu_group > a {
+            display: block;
+            padding: 8px 8px;
+			margin-right: 5px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .menu > a:hover, .menu .menu_group > a:hover {
+            background-color: #45a049;
+        }
+
+        /* Định dạng menu con */
+        .menu-content {
+            display: none;
+            position: absolute;
+            top: 100%; /* Hiển thị ngay dưới menu cha */
+            left: 0;
+            min-width: 160px;
+			width: 300px;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1; /* Đảm bảo menu con nằm trên menu cha */
+        }
+
+        .menu-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .menu-content a:hover {
+            background-color: #ddd;
+        }
+
+        /* Hiển thị menu con khi hover */
+        .menu:hover .menu-content {
+            display: block;
+        }
+		
+		.maincontent {
+			height: calc(97vh - 40px);
+			/*background-color: red;*/
+			overflow-y: auto; /* Cuộn dọc */
+		}
+		
+		.panel {
+            border: 1px solid #ddd; /* Đường viền cho panel */
+            border-radius: 8px; /* Bo tròn các góc */
+            overflow: hidden; /* Ẩn phần thừa */
+            max-width: 97vw; /* Chiều rộng tối đa */
+            /* margin: 20px auto; /* Căn giữa và thêm khoảng cách */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Tạo bóng */
+			margin-bottom: 10px;
+        }
+
+        /* CSS cho tiêu đề của panel */
+        .panel-header, .popup-header {
+            /* background-color: #4CAF50; */ /* Màu nền cho tiêu đề */
+			background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; /* Màu chữ */
+            padding: 10px 15px; /* Khoảng cách trong */
+            font-size: 18px; /* Kích thước chữ */
+            font-weight: bold; /* Chữ đậm */
+            text-align: center; /* Căn giữa chữ */
+        }
+
+		.panel-body, #main1, #main2, #main3, #main4, #main5, #main6 {
+			background-color: #f9f9f9; /* Màu nền cho nội dung */
+            color: #333; /* Màu chữ */
+			
+			display: grid;
+            grid-template-columns: repeat(var(--socotmain), 1fr); /* 5 cột */
+			
+            gap: 5px; /* Khoảng cách giữa các ô */
+            max-height: 100vh; /* Chiều cao tối đa của vùng chứa để có thể cuộn */
+			
+            overflow-y: auto; /* Cuộn dọc */
+            padding: 10px;
+			margin-bottom: 10px;
+            /*border: 1px solid #ddd;*/
+			
+			width: 97vw;
+		}
+		
+		
+		.inputmain {
+			margin-top: 5px;
+			margin-left: 30px;
+		}
+		
+		.dvct {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr); /* 5 cột */
+			
+		}
+		
+		.highlight-container {
+            width: 65px;
+			height: 40px;
+            margin: 0px auto;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer; /* Đổi con trỏ chuột khi hover */
+            transition: background-color 0.3s ease; /* Hiệu ứng mượt khi đổi màu */
+			font-size: 13px;
+        }
+
+        .highlighted {
+            background-color: #ffeb3b; /* Màu vàng khi được highlight */
+			font-size: 13px;
+        }
+
+		#popup {
+			
+			height: 98vh; /* Chiều cao tối đa của vùng chứa để có thể cuộn */
+			width: 99vw;
+			position: absolute;
+            top: 5px;
+            left: 5px;
+			border: 1px solid #ddd; /* Đường viền cho panel */
+            border-radius: 8px; /* Bo tròn các góc */
+            overflow: hidden; /* Ẩn phần thừa */
+            
+            /* margin: 20px auto; /* Căn giữa và thêm khoảng cách */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Tạo bóng */
+			background-color: white;
+			display: none;
+			z-index: 10; /* Giá trị z-index cao hơn để thẻ này nổi lên trên */
+        }
+		
+
+		
+        #containerDiadanh {
+            display: grid;
+            grid-template-columns: repeat(var(--socot), 1fr); /* 5 cột */
+			width: 98%;
+            gap: 5px; /* Khoảng cách giữa các ô */
+            max-height: 80vh; /* Chiều cao tối đa của vùng chứa để có thể cuộn */
+			
+            overflow-y: auto; /* Cuộn dọc */
+            padding: 10px;
+            border: 1px solid #ddd;
+			background-color: white;
+			
+        }
+        .box1 {
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            text-align: center;
+			height: 50px;
+            cursor: pointer;
+			font-size: 14px;
+			font-weight: bold;
+        }
+        #search1 {
+            margin: 10px;
+            padding: 5px;
+            width: 250px;
+        }
+    </style>
+</head>
+<body>
+	<div class="menu" id="menu0">
+        <a>Danh mục</a>
+        <div class="menu-content">
+            <a id="menu1_maincontent1" >Tạo đơn hàng loại</a>
+            <a id="menu2_maincontent2">Danh sách các đơn đã tạo</a>
+            <a id="menu3_maincontent3">Chuyển đổi để massupload</a>
+        </div>
+		
+    </div>
+	<div class="menu" id="menu1">
+        <div class="menu_group" style="display: grid; grid-template-columns: repeat(2, 1fr)">
+			<a>Tạo đơn</a>
+			<a>Xóa mới</a>	
+		</div>
+    </div>
+
+	<div class="menu" id="menu2" style="display: none">
+        <div class="menu_group" style="display: grid; grid-template-columns: repeat(1, 1fr)">
+			<a>Sửa</a>
+		</div>		
+    </div>
+	<div class="menu" id="menu3" style="display: none">
+        <div class="menu_group" style="display: grid; grid-template-columns: repeat(1, 1fr)">
+			<a>Lưu</a>
+		</div>		
+    </div>
+	
+	<div id= "maincontent">
+		<div id= "maincontent1" class="maincontent">
+			<div class="panel">
+				<div class="panel-header">Thông tin người gửi</div>
+				<div id= "main1">
+					<div>
+						<button id="sdtNGButton">...</button>
+						<label for="sdtNG">Điện thoại người gửi:</label>
+						<button id="sdtNGDefaultButton">!</button>
+						<input type="tel" id="sdtNG" name="sdtNG" class="inputmain" placeholder="Nhập Số điện thoại">
+						
+					</div>
+					<div>
+						<button id="tenNGButton">...</button>
+						<label for="tenNG">Tên người gửi:</label>
+						<input type="text" id="tenNG" name="tenNG" class="inputmain"  placeholder="Nhập tên người gửi">
+						
+					</div>
+					<div>
+						<label for="diachiNG">Địa chỉ người gửi:</label>
+						<input type="text" id="diachiNG" name="diachiNG" class="inputmain"  placeholder="Nhập địa chỉ người gửi">
+						
+					</div>
+					<div>
+						<button id="diaphuongNGButton">...</button>
+						<label for="diaphuongNG">Địa phương người gửi:</label>
+						<input type="text" id="diaphuongNG" name="diaphuongNG" class="inputmain"  placeholder="Nhập địa phương người gửi">
+						
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="panel-header">Thông tin đơn vị thu gom</div>
+				<div id= "main2">
+					<div>
+						<button id="sdtTGButton">...</button>
+						<label for="sdtTG">Điện thoại thu gom:</label>
+						<button id="sdtTGDefaultButton">!</button>
+						<input type="tel" id="sdtTG" name="sdtTG" class="inputmain" placeholder="Nhập Số điện thoại">
+						
+					</div>
+					<div>
+						<button id="tenTGButton">...</button>
+						<label for="tenTG">Tên đơn vị thu gom:</label>
+						<input type="text" id="tenTG" name="tenTG" class="inputmain"  placeholder="Nhập tên thu gom">
+						
+					</div>
+					<div>
+						<label for="diachiTG">Địa chỉ đơn vị thu gom:</label>
+						<input type="text" id="diachiTG" name="diachiTG" class="inputmain"  placeholder="Nhập địa chỉ thu gom">
+						
+					</div>
+					<div>
+						<button id="diaphuongTGButton">...</button>
+						<label for="diaphuongTG">Địa phương đơn vị thu gom:</label>
+						<input type="text" id="diaphuongTG" name="diaphuongTG" class="inputmain"  placeholder="Nhập địa phương thu gom">
+						
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="panel-header">Thông tin người nhận</div>
+				<div id= "main3">
+					<div>
+						<button id="sdtNNButton">...</button>
+						<label for="sdtNN">Điện thoại người nhận:</label>
+						<input type="tel" id="sdtNN" name="sdtNN" class="inputmain"  placeholder="Nhập Số điện thoại">
+						
+					</div>
+					<div>
+						<button id="tenNNButton">...</button>
+						<label for="tenNN">Tên người nhận:</label>
+						<input type="text" id="tenNN" name="tenNN" class="inputmain"  placeholder="Nhập tên người nhận">
+						
+					</div>
+					<div>
+						<label for="diachiNN">Địa chỉ người nhận:</label>
+						<input type="text" id="diachiNN" name="diachiNN" class="inputmain"  placeholder="Nhập địa chỉ người nhận">
+						
+					</div>
+					<div>
+						<button id="diaphuongNNButton">...</button>
+						<label for="diaphuongNN">Địa phương người nhận:</label>
+						<input type="text" id="diaphuongNN" name="diaphuongNN" class="inputmain"  placeholder="Nhập địa phương người nhận">
+						
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="panel-header">Thông tin hàng hóa</div>
+				<div id= "main4">
+					<div>
+						<button id="tenHHButton">...</button>
+						<label for="tenHH">Tên hàng hóa:</label>
+						<input type="text" id="tenHH" name="tenHH" class="inputmain"  placeholder="Nhập tên hàng hóa">
+						
+					</div>
+					<div>
+						<label for="soluongHH">Số lượng hàng hóa:</label>
+						<input type="number" id="soluongHH" name="soluongHH" class="inputmain"  placeholder="Nhập số lượng">
+						
+					</div>
+					<div>
+						<label for="tonggiatienHH">Tổng tiền hàng hóa (đồng):</label>
+						<input type="number" id="tonggiatienHH" name="tonggiatienHH" class="inputmain"  placeholder="Nhập tổng tiền hàng hóa">
+						
+					</div>
+					<div>
+						<label for="chitietHH">Chi tiết hàng hóa:</label>
+						<input type="text" id="chitietHH" name="chitietHH" class="inputmain"  placeholder="Nhập chi tiết hàng hóa">
+						
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="panel-header">Kích thước, cân nặng hàng hóa</div>
+				<div id= "main5">
+					<div>
+						<label for="cannangHH">Cân nặng của hàng hóa (kg):</label>
+						<input type="number" id="cannangHH" name="cannangHH" class="inputmain"  placeholder="Nhập cân năng">
+						
+					</div>
+					<div>
+						<label for="canh1HH">Kích thước cạnh 1 (cm):</label>
+						<input type="number" id="canh1HH" name="canh1HH" class="inputmain"  placeholder="Nhập cạnh 1">
+						
+					</div>
+					<div>
+						<label for="canh2HH">Kích thước cạnh 2 (cm):</label>
+						<input type="number" id="canh2HH" name="canh2HH" class="inputmain"  placeholder="Nhập cạnh 2">
+						
+					</div>
+					<div>
+						<label for="canh3HH">Kích thước cạnh 3 (cm):</label>
+						<input type="number" id="canh3HH" name="canh3HH" class="inputmain"  placeholder="Nhập cạnh 3">
+						
+					</div>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="panel-header">Dịch vụ cộng thêm</div>
+				<div id= "main6">
+					<div class="dvct">
+						<div class="highlight-container" id="highlightDiv1">
+							Lưu kho
+						</div>
+						<div class="highlight-container" id="highlightDiv2">
+							Giao hàng 1 phần
+						</div>
+						<div class="highlight-container" id="highlightDiv3">
+							Đồng kiểm
+						</div>
+					</div>
+					
+					<div class="dvct">
+						
+						<div class="highlight-container" id="highlightDiv4">
+							Bảo hiểm
+						</div>
+						<div class="highlight-container" id="highlightDiv5">
+							
+						</div>
+						<div class="highlight-container" id="highlightDiv6">
+							
+						</div>
+						
+					</div>
+					
+					<div class="dvct">
+						<div class="highlight-container" id="highlightDiv5">
+							
+						</div>
+						<div class="highlight-container" id="highlightDiv6">
+							
+						</div>
+						<div class="highlight-container" id="highlightDiv6">
+							
+						</div>
+						
+					</div>
+					
+					<div class="dvct">
+						<div class="highlight-container" id="highlightDiv7">
+							
+						</div>
+						<div class="highlight-container" id="highlightDiv8">
+							
+						</div>
+						<div class="highlight-container" id="highlightDiv6">
+							
+						</div>
+						
+					</div>
+					
+					<div>
+						<button id="ghichuHHButton">...</button>
+						<label for="ghichuHH">Ghi chú:</label>
+						<input type="text" id="ghichuHH" name="ghichuHH" class="inputmain"  placeholder="Nhập ghi chú hàng hóa">
+						
+					</div>
+
+				</div>
+			</div>
+		</div>
+		
+		<div id= "maincontent2" class="maincontent"  style="display: none">
+			<div class="panel">
+				<div class="panel-header">Danh sách đơn đã tạo</div>
+				<div>
+					Quang
+				</div>
+			</div>
+		</div>
+		<div id= "maincontent3" class="maincontent"  style="display: none">
+			<div class="panel">
+				<div class="panel-header">Chuyển đổi thành file massupload để tạo đơn</div>
+				<div>
+					Thu
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+	<div id="popup">
+		<div id="popup1">
+			<div class="popup-header">Nhập nhanh địa danh</div>
+			<div class="popup-body">
+				<input type="text" id="search1" placeholder="Nhập từ gợi nhớ..." oninput="filterDivs1()">
+				<button id="closePopup">Đóng</button>
+				<div id="containerDiadanh"></div>
+			</div>
+		</div>
+		<div id="popup2" style="display: none">
+			<div class="popup-header">Nhập nhanh sđt và tên</div>
+			<div class="popup-body">
+				<input type="text" id="search2" placeholder="Nhập từ gợi nhớ..." oninput="filterDivs2()">
+				<button id="closePopup">Đóng</button>
+				<div id="containerDiadanh"></div>
+			</div>
+		</div>
+    </div>
+	
+    
+
+    <script>
+		
+		Diadanh = [];
+		
+		function preventBack() {
+            history.pushState(null, null, location.href);
+        }
+
+        // Gọi hàm mỗi khi trạng thái lịch sử thay đổi
+        window.addEventListener('popstate', function () {
+            preventBack();
+        });
+
+        // Gọi hàm lần đầu khi trang tải
+        window.onload = function () {
+            preventBack();
+        };
+		
+		
+		const swipeDiv = document.getElementById('maincontent');
+
+        // Khai báo các biến để lưu tọa độ vuốt
+        let startX;
+		let startY;
+
+        // Lắng nghe sự kiện khi bắt đầu chạm
+        swipeDiv.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX; // Lưu tọa độ X khi bắt đầu chạm
+			startY = e.touches[0].clientY; // Lưu tọa độ X khi bắt đầu chạm
+        });
+
+        // Lắng nghe sự kiện khi kết thúc chạm
+        swipeDiv.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX; // Lấy tọa độ X khi kết thúc chạm
+			const endY = e.changedTouches[0].clientY; // Lấy tọa độ X khi kết thúc chạm
+            handleSwipe(startX, endX, startY, endY);
+        });
+
+        // Hàm xử lý vuốt
+        function handleSwipe(start, end,startY, endY) {
+            const diffX = start - end;
+			const diffY = startY - endY;
+
+            if (diffX > 50) {
+                // Vuốt trái
+                //swipeDiv.style.backgroundColor = '#f44336'; // Đổi màu khi vuốt trái
+                //swipeDiv.textContent = 'Vuốt trái';
+				if(diffY < 100) {
+					alert("Vuốt trái")
+				}
+				
+            } else if (diffX < -50) {
+                // Vuốt phải
+                //swipeDiv.style.backgroundColor = '#2196F3'; // Đổi màu khi vuốt phải
+                //swipeDiv.textContent = 'Vuốt phải';
+				if(diffY < 100) {
+					alert("Vuốt phải")
+				}
+				
+            } else {
+                // Nếu không vuốt đủ xa
+                //swipeDiv.style.backgroundColor = '#4CAF50'; // Giữ màu mặc định
+                //swipeDiv.textContent = 'Vuốt trái hoặc phải';
+				//alert("Vuốt trái hoặc phải")
+            }
+        }
+		
+		
+		document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+
+        // Vô hiệu hóa phím F12 và các phím tắt DevTools
+        document.addEventListener('keydown', function (e) {
+            // F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+            }
+            // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+Shift+C
+            if (e.ctrlKey && (e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C') || e.key === 'U')) {
+                e.preventDefault();
+            }
+        });
+
+        // Cho phép copy/paste trong các input
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('copy', (e) => {
+                // Cho phép copy
+                e.stopPropagation();
+            });
+            input.addEventListener('paste', (e) => {
+                // Cho phép paste
+                e.stopPropagation();
+            });
+        });
+
+		
+		
+		function downloadAndProcessCSV() {
+			// URL của file CSV
+			const csvUrl = 'https://qtdu.github.io/lzd/Diadanh.csv'; // Thay bằng URL thực tế của file CSV
+
+			// Tải về CSV và chuyển đổi thành mảng
+			fetch(csvUrl)
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('Network response was not ok ' + response.statusText);
+					}
+					return response.text(); // Lấy nội dung CSV dưới dạng text
+				})
+				.then(csvText => {
+					// Chuyển đổi CSV text thành mảng
+					//const csvArray = csvToArray(csvText);
+					const csvArray = csvToArray(csvText);
+					
+					Diadanh = convertObjectArrayTo2DArray(csvArray);
+					//alert(Diadanh[0][0])
+					
+					NapData();
+					//console.log(csvArray);
+					
+					// Hiển thị kết quả lên trang
+					//document.getElementById('output').textContent = JSON.stringify(csvArray, null, 2);
+				})
+				.catch(error => {
+					console.error('There was a problem with the fetch operation:', error);
+				});
+		}
+		
+		function convertObjectArrayTo2DArray(objArray) {
+			// Lấy các keys từ object đầu tiên để xác định thứ tự giá trị
+			const keys = Object.keys(objArray[0]);
+
+			// Chuyển đổi từng object thành một mảng các giá trị
+			const array2D = objArray.map(obj => keys.map(key => obj[key]));
+
+			return array2D;
+		}
+
+		// Hàm chuyển đổi CSV text thành mảng
+		function csvToArray(csvText) {
+			// Chia các dòng
+			const lines = csvText.trim().split('\n');
+			
+			// Lấy headers từ dòng đầu tiên
+			const headers = lines[0].split(',');
+			
+			// Tạo mảng chứa các đối tượng từ các dòng còn lại
+			const array = lines.slice(1).map(line => {
+				const values = line.split(',');
+				const obj = {};
+				headers.forEach((header, index) => {
+					obj[header.trim()] = values[index].trim();
+				});
+				return obj;
+			});
+
+			return array;
+		}
+		downloadAndProcessCSV();
+
+		function detectDevice() {
+            // Lấy chuỗi user agent từ trình duyệt
+            const userAgent = navigator.userAgent.toLowerCase();
+
+            // Kiểm tra các từ khóa trong user agent để xác định thiết bị
+            const isMobile = /iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(userAgent);
+			
+
+            // Hiển thị kết quả xác định thiết bị
+            if (isMobile) {
+                return [2,1]; // "Thiết bị: Mobile";
+            } else {
+                return [5,5]; // "Thiết bị: Máy tính (Desktop)";
+            }
+        }
+		const container = document.getElementById('containerDiadanh');
+		function NapData() {
+			const dev = detectDevice();
+			document.documentElement.style.setProperty('--socot', dev[0]);
+			document.documentElement.style.setProperty('--socotmain', dev[1]);
+			for (let i = 0; i < Diadanh.length; i++) {
+
+				const div = document.createElement('div');
+				div.className = 'box1';
+				//div.textContent = Diadanh[i][0] + "<br>" + Diadanh[i][1] + "<br>" + Diadanh[i][2];
+				div.innerHTML = Diadanh[i][2] + "<br>+" + Diadanh[i][1] + "<br>+" + Diadanh[i][0];
+				div.onclick = () => {
+					Text1 = (div.textContent).replaceAll('\n','');
+					arrText = Text1.split('+');
+					Text1 = arrText[0] + "; " + arrText[1] + "; " + arrText[2]
+					textbox1 = varDiaphuong.substring(0,varDiaphuong.length - 6);
+					document.getElementById(textbox1).value = Text1;
+					document.getElementById('popup').style.display = "none";
+				}
+				//varDiaphuong
+				container.appendChild(div);
+			}
+		}
+		
+		
+		
+		function check(bd,kt, arr, val) {
+			timthay = 0;
+			for(let j=bd; j < kt; j++) {
+				text = (arr[j]).toLowerCase();
+				if (text.includes(val.trim())) {
+					timthay = 1;
+					break;
+				}
+			}
+			return timthay;
+		}
+
+		function kethopTimkiem (x1, x2, x3) {
+			return x1 * x2 * x3
+		}
+        // Hàm lọc div theo từ khóa
+        function filterDivs1() {
+            const searchValue = document.getElementById('search1').value.toLowerCase();
+            const boxes = document.querySelectorAll('.box1');
+			
+			
+			searchValueArr = searchValue.split(" ")
+			l = searchValueArr.length
+			ketqua = []
+			for(let i=0; i < Diadanh.length; i++) {
+				
+				if(l == 1) {
+					timthay1 = check(0,6, Diadanh[i], searchValueArr[0])
+					timthay = kethopTimkiem(timthay1, 1, 1)
+
+				}
+				if(l == 2) {
+					timthay1 = check(3,4, Diadanh[i], searchValueArr[0])
+					timthay2 = check(4,5, Diadanh[i], searchValueArr[1])
+					timthay = kethopTimkiem(timthay1, timthay2, 1)
+					
+					if(timthay == 0) {
+						timthay1 = check(3,4, Diadanh[i], searchValueArr[1])
+						timthay2 = check(4,5, Diadanh[i], searchValueArr[0])
+						timthay = kethopTimkiem(timthay1, timthay2, 1)
+					}
+					
+					if(timthay == 0) {
+						timthay1 = check(3,4, Diadanh[i], searchValueArr[0])
+						timthay2 = check(5,6, Diadanh[i], searchValueArr[1])
+						timthay = kethopTimkiem(timthay1, timthay2, 1)
+					}
+					
+					if(timthay == 0) {
+						timthay1 = check(3,4, Diadanh[i], searchValueArr[1])
+						timthay2 = check(5,6, Diadanh[i], searchValueArr[0])
+						timthay = kethopTimkiem(timthay1, timthay2, 1)
+					}
+					
+					if(timthay == 0) {
+						timthay1 = check(4,5, Diadanh[i], searchValueArr[0])
+						timthay2 = check(5,6, Diadanh[i], searchValueArr[1])
+						timthay = kethopTimkiem(timthay1, timthay2, 1)
+					}
+					
+					if(timthay == 0) {
+						timthay1 = check(4,5, Diadanh[i], searchValueArr[1])
+						timthay2 = check(5,6, Diadanh[i], searchValueArr[0])
+						timthay = kethopTimkiem(timthay1, timthay2, 1)
+					}
+
+				}
+				
+				
+				if(l == 3) {
+					timthay1 = check(3,4, Diadanh[i], searchValueArr[0])
+					timthay2 = check(4,5, Diadanh[i], searchValueArr[1])
+					timthay3 = check(5,6, Diadanh[i], searchValueArr[2])
+					timthay = kethopTimkiem(timthay1, timthay2, timthay3)
+					
+					
+					if(timthay == 0) {
+						timthay1 = check(3,4, Diadanh[i], searchValueArr[0])
+						timthay2 = check(4,5, Diadanh[i], searchValueArr[2])
+						timthay3 = check(5,6, Diadanh[i], searchValueArr[1])
+						timthay = kethopTimkiem(timthay1, timthay2, timthay3)
+					}
+					
+					if(timthay == 0) {
+						timthay1 = check(3,4, Diadanh[i], searchValueArr[1])
+						timthay2 = check(4,5, Diadanh[i], searchValueArr[0])
+						timthay3 = check(5,6, Diadanh[i], searchValueArr[2])
+						timthay = kethopTimkiem(timthay1, timthay2, timthay3)
+					}
+					
+					if(timthay == 0) {
+						timthay1 = check(3,4, Diadanh[i], searchValueArr[1])
+						timthay2 = check(4,5, Diadanh[i], searchValueArr[2])
+						timthay3 = check(5,6, Diadanh[i], searchValueArr[0])
+						timthay = kethopTimkiem(timthay1, timthay2, timthay3)
+					}
+					
+					if(timthay == 0) {
+						timthay1 = check(3,4, Diadanh[i], searchValueArr[2])
+						timthay2 = check(4,5, Diadanh[i], searchValueArr[0])
+						timthay3 = check(5,6, Diadanh[i], searchValueArr[1])
+						timthay = kethopTimkiem(timthay1, timthay2, timthay3)
+					}
+					
+					if(timthay == 0) {
+						timthay1 = check(3,4, Diadanh[i], searchValueArr[2])
+						timthay2 = check(4,5, Diadanh[i], searchValueArr[1])
+						timthay3 = check(5,6, Diadanh[i], searchValueArr[0])
+						timthay = kethopTimkiem(timthay1, timthay2, timthay3)
+					}
+				}
+				
+
+
+				if (timthay == 1) {
+					ketqua.push(i);
+				}
+			}
+			
+			for(let i=0; i < boxes.length; i++) {
+				const box = boxes[i]
+				box.style.display = 'none';
+			}
+			
+			for(let i=0; i < ketqua.length; i++) {
+				
+				const box = boxes[ketqua[i]]
+				box.style.display = 'block';
+			}
+
+			
+        }
+		
+		document.getElementById('closePopup').addEventListener('click', function () {
+			document.getElementById('popup').style.display = "none"
+			
+		});
+		
+		arrDiaphuong = ["diaphuongNGButton", "diaphuongTGButton", "diaphuongNNButton"];
+		varDiaphuong = "";
+		for(let i=0; i<arrDiaphuong.length; i++) {
+			document.getElementById(arrDiaphuong[i]).addEventListener('click', function () {
+			
+				document.getElementById('popup').style.display = "block";
+				document.getElementById('search1').value = "";
+				document.getElementById('search1').focus();
+				varDiaphuong = arrDiaphuong[i]
+			});
+		}
+		
+		
+		for(let i=1; i<= 4; i++) {
+			document.getElementById('highlightDiv' + i).addEventListener('click', function(e) {
+				// Toggle class 'highlighted' để đổi màu
+				e.target.classList.toggle('highlighted');
+
+			});
+		}
+		
+		for(let i=1; i<= 3; i++) {
+			document.getElementById('menu' + i + '_maincontent' + i).addEventListener('click', function(e) {
+				// Toggle class 'highlighted' để đổi màu
+				menu = (e.target.id).split("_");
+				for (j=1; j<=3; j++) {
+					document.getElementById("maincontent" + j).style.display = "none";
+					document.getElementById("menu" + j).style.display = "none";
+				}
+
+				document.getElementById(menu[0]).style.display = "inline-block";
+				document.getElementById(menu[1]).style.display = "block";
+			});
+		}
+		
+		/*
+		document.getElementById('convertUploadBtn').addEventListener('click', async () => {
+			// Mảng 2D mẫu
+			const data = [
+				[1, 'Alice', 25],
+				[2, 'Bob', 30],
+				[3, 'Charlie', 35]
+			];
+
+			// Chuyển đổi mảng 2D thành CSV
+			const csvContent = arrayToCSV(data);
+
+			// Hiển thị nội dung CSV
+			//document.getElementById('output').textContent = csvContent;
+
+			// Tải CSV lên GitHub
+			await uploadCSVToGitHub(csvContent);
+		});
+		*/
+		// Hàm chuyển đổi mảng 2D thành chuỗi CSV
+		function arrayToCSV(array) {
+			return array.map(row => row.join(',')).join('\n');
+		}
+
+		// Hàm tải CSV lên GitHub
+		async function uploadCSVToGitHub(csvContent) {
+
+			const repo = 'lzd'; // Thay bằng tên repo của bạn
+			const owner = 'qtdu'; // Thay bằng tên người dùng GitHub của bạn
+			const path = 'testQ.csv'; // Đường dẫn tới file .db trong repo
+			const branch = 'main'; // Nhánh GitHub bạn đang làm việc
+			const githubToken = '567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'; // Thay bằng GitHub Personal Access Token của bạn
+
+			// Tạo nội dung file base64
+			const contentBase64 = btoa(unescape(encodeURIComponent(csvContent)));
+
+			// URL API để lấy SHA của file nếu đã tồn tại
+			const getFileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+
+			// Kiểm tra xem file có tồn tại không để lấy SHA
+			let sha = '';
+			try {
+				const response = await fetch(getFileUrl, {
+					headers: {
+						'Authorization': `token ${githubToken}`,
+						'Accept': 'application/vnd.github.v3+json'
+					}
+				});
+
+				if (response.ok) {
+					const fileData = await response.json();
+					sha = fileData.sha; // SHA của file nếu đã tồn tại
+				}
+			} catch (error) {
+				console.error('Error checking file existence:', error);
+			}
+
+			// URL API để tải file lên
+			const uploadUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+			// Dữ liệu tải lên
+			const uploadData = {
+				message: 'Upload CSV file',
+				content: contentBase64,
+				branch: branch
+			};
+
+			// Nếu file đã tồn tại, thêm SHA vào dữ liệu tải lên
+			if (sha) {
+				uploadData.sha = sha;
+			}
+
+			try {
+				// Gửi yêu cầu PUT để tải file lên GitHub
+				const response = await fetch(uploadUrl, {
+					method: 'PUT',
+					headers: {
+						'Authorization': `token ${githubToken}`,
+						'Accept': 'application/vnd.github.v3+json'
+					},
+					body: JSON.stringify(uploadData)
+				});
+
+				if (response.ok) {
+					alert('CSV đã được tải lên GitHub thành công!');
+				} else {
+					const error = await response.json();
+					console.error('Upload failed:', error);
+					alert('Tải lên thất bại. Kiểm tra console để biết chi tiết.');
+				}
+			} catch (error) {
+				console.error('Error uploading CSV to GitHub:', error);
+				alert('Có lỗi xảy ra khi tải lên GitHub.');
+			}
+		}
+		
+    </script>
+</body>
+</html>
