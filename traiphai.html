@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuốt Trái Phải Trên Div</title>
+    <style>
+        .swipe-container {
+            width: 300px;
+            height: 200px;
+            background-color: #4CAF50; /* Màu nền */
+            margin: 50px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 20px;
+            text-align: center;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="swipe-container" id="swipeDiv">
+        Vuốt trái hoặc phải
+    </div>
+
+    <script>
+        // Chọn thẻ div mà bạn muốn áp dụng chức năng vuốt
+        const swipeDiv = document.getElementById('swipeDiv');
+
+        // Khai báo các biến để lưu tọa độ vuốt
+        let startX;
+
+        // Lắng nghe sự kiện khi bắt đầu chạm
+        swipeDiv.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX; // Lưu tọa độ X khi bắt đầu chạm
+        });
+
+        // Lắng nghe sự kiện khi kết thúc chạm
+        swipeDiv.addEventListener('touchend', (e) => {
+            const endX = e.changedTouches[0].clientX; // Lấy tọa độ X khi kết thúc chạm
+            handleSwipe(startX, endX);
+        });
+
+        // Hàm xử lý vuốt
+        function handleSwipe(start, end) {
+            const diffX = start - end;
+
+            if (diffX > 50) {
+                // Vuốt trái
+                swipeDiv.style.backgroundColor = '#f44336'; // Đổi màu khi vuốt trái
+                swipeDiv.textContent = 'Vuốt trái';
+            } else if (diffX < -50) {
+                // Vuốt phải
+                swipeDiv.style.backgroundColor = '#2196F3'; // Đổi màu khi vuốt phải
+                swipeDiv.textContent = 'Vuốt phải';
+            } else {
+                // Nếu không vuốt đủ xa
+                swipeDiv.style.backgroundColor = '#4CAF50'; // Giữ màu mặc định
+                swipeDiv.textContent = 'Vuốt trái hoặc phải';
+            }
+        }
+    </script>
+</body>
+</html>
