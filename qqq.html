@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>QR & Barcode Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+    .container {
+      display: flex;
+      width: 200%;
+      transition: transform 0.3s ease-in-out;
+    }
+    .screen {
+      width: 100vw;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    #reader {
+      width: 100%;
+      max-width: 480px;
+      margin: auto;
+    }
+    #textarea {
+      width: 100%;
+      height: 150px;
+    }
+    #table-screen {
+      overflow: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 5px;
+      word-break: break-word;
+      text-align: left;
+    }
+    select, button {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="container">
+    <div class="screen" id="scan-screen">
+      <h3>Quét mã</h3>
+      <select id="user-select"><option>Đang tải...</option></select>
+      <div id="reader"></div>
+      <textarea id="textarea" readonly></textarea><br/>
+      <button onclick="submitData()">Gửi dữ liệu</button>
+    </div>
+    <div class="screen" id="table-screen">
+      <h3>Dữ liệu đã quét</h3>
+      <table id="data-table">
+        <thead><tr><th>Người</th><th>Mã</th><th>Thời gian</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const appScriptUrl = "https://script.google.com/macros/s/AKfycbw_R_2iW_JXrh3UNrp2jEk3Gmjr-gzAVW-98fmLlRB4WcYU4FwP2mBRzipBZNph1Ys/exec";
+    const reader = new Html5Qrcode("reader");
+    const textarea = document.getElementById("textarea");
+    const userSelect = document.getElementById("user-select");
+    const dataTable = document.getElementById("data-table").querySelector("tbody");
+    let buffer = [];
+    let scanning = true;
+
+    function loadUsers() {
+      fetch(appScriptUrl + "?action=users")
+        .then(r => r.json())
+        .then(data => {
+          userSelect.innerHTML = data.map(name => `<option>${name}</option>`).join("");
+        });
+    }
+
+    function submitData() {
+      if (!buffer.length) return alert("Không có dữ liệu để gửi.");
+      const payload = {
+        user: userSelect.value,
+        codes: buffer
+      };
+      fetch(appScriptUrl, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("Đã gửi thành công!");
+          buffer = [];
+          textarea.value = "";
+        } else {
+          alert("Gửi thất bại: " + data.message);
+        }
+      });
+    }
+
+    function loadData() {
+      fetch(appScriptUrl + "?action=data")
+        .then(r => r.json())
+        .then(rows => {
+          dataTable.innerHTML = rows.map(r => `<tr><td>${r.user}</td><td>${r.code}</td><td>${r.time}</td></tr>`).join("");
+        });
+    }
+
+    function isMobile() {
+      return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+
+    function startScanner() {
+      if (!isMobile()) {
+        alert("Chỉ hỗ trợ trên điện thoại.");
+        return;
+      }
+      Html5Qrcode.getCameras().then(devices => {
+        let camId = devices.find(d => d.label.toLowerCase().includes("back"))?.id || devices[0].id;
+        reader.start(
+          camId,
+          { fps: 10, qrbox: 250 },
+          code => {
+            if (!buffer.includes(code)) {
+              buffer.push(code);
+              textarea.value += code + "\n";
+            }
+          }
+        );
+      });
+    }
+
+    let touchStartX = 0;
+    document.body.addEventListener("touchstart", e => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    document.body.addEventListener("touchend", e => {
+      let diff = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(diff) > 50) {
+        const container = document.getElementById("container");
+        container.style.transform = diff < 0 ? "translateX(-100vw)" : "translateX(0)";
+      }
+    });
+
+    loadUsers();
+    loadData();
+    startScanner();
+    setInterval(loadData, 10000);
+  </script>
+</body>
+</html>
