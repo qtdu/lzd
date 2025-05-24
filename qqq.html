@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Quét mã QR/Barcode</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      overflow: hidden;
+    }
+    #app {
+      display: flex;
+      width: 200vw;
+      transition: transform 0.3s ease;
+    }
+    .screen {
+      width: 100vw;
+      height: 100vh;
+      box-sizing: border-box;
+      padding: 10px;
+    }
+    #reader {
+      width: 100%;
+      max-width: 100%;
+    }
+    #textarea {
+      width: 100%;
+      height: 100px;
+      overflow-y: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    td, th {
+      border: 1px solid #ccc;
+      padding: 4px;
+      font-size: 14px;
+    }
+    select, button {
+      font-size: 18px;
+      padding: 6px;
+      width: 100%;
+      margin: 6px 0;
+    }
+    #notice {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="screen" id="scanScreen">
+      <div id="reader"></div>
+      <select id="user"></select>
+      <textarea id="textarea" readonly></textarea>
+      <button onclick="sendData()">Gửi dữ liệu</button>
+      <div id="notice"></div>
+    </div>
+    <div class="screen" id="dataScreen">
+      <table id="dataTable"><thead><tr><th>Người</th><th>Mã</th><th>Thời gian</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <script>
+    const appScriptUrl = "https://script.google.com/macros/s/AKfycbxYsfa2UbLgrPrxNbTL2ey0TURnQmmygOjD5JcWUWCmDMCIkrVgSxHQ6pJ9zi4_Z1k/exec";
+    const textarea = document.getElementById("textarea");
+    const userSelect = document.getElementById("user");
+    const notice = document.getElementById("notice");
+    let scannedCodes = new Set();
+
+    function updateUserList() {
+      fetch(appScriptUrl)
+        .then(res => res.json())
+        .then(users => {
+          userSelect.innerHTML = "";
+          users.forEach(name => {
+            let opt = document.createElement("option");
+            opt.value = opt.textContent = name;
+            userSelect.appendChild(opt);
+          });
+        });
+    }
+
+    function sendData() {
+      if (!userSelect.value || scannedCodes.size === 0) return;
+      fetch(appScriptUrl, {
+        method: "POST",
+        body: JSON.stringify({
+          user: userSelect.value,
+          codes: Array.from(scannedCodes)
+        })
+      }).then(res => res.text())
+      .then(res => {
+        if (res === "OK") {
+          notice.textContent = "Đã gửi thành công!";
+          scannedCodes.clear();
+          textarea.value = "";
+        } else {
+          notice.textContent = "Có mã đã trùng!";
+        }
+        setTimeout(() => notice.textContent = "", 3000);
+      });
+    }
+
+    function startScanner() {
+      const qr = new Html5Qrcode("reader");
+      Html5Qrcode.getCameras().then(devices => {
+        let backCam = devices.find(d => d.label.toLowerCase().includes("back")) || devices[0];
+        qr.start(
+          { deviceId: { exact: backCam.id } },
+          { fps: 10, qrbox: 250 },
+          code => {
+            if (!scannedCodes.has(code)) {
+              scannedCodes.add(code);
+              textarea.value += code + "\n";
+            }
+          }
+        );
+      });
+    }
+
+    function updateTable() {
+      fetch(appScriptUrl + "?t=" + Date.now())
+        .then(res => res.text())
+        .then(text => {
+          let rows = text.split("\n").map(row => row.split(",")).filter(r => r.length === 3);
+          const tbody = document.querySelector("#dataTable tbody");
+          tbody.innerHTML = "";
+          rows.forEach(r => {
+            const tr = document.createElement("tr");
+            r.forEach(cell => {
+              const td = document.createElement("td");
+              td.textContent = cell;
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+        });
+    }
+
+    let touchStartX = 0;
+    document.addEventListener("touchstart", e => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+    document.addEventListener("touchend", e => {
+      let dx = e.changedTouches[0].screenX - touchStartX;
+      const app = document.getElementById("app");
+      if (dx < -50) app.style.transform = "translateX(-100vw)";
+      else if (dx > 50) app.style.transform = "translateX(0vw)";
+    });
+
+    if (/Android|iPhone/i.test(navigator.userAgent)) {
+      updateUserList();
+      startScanner();
+      setInterval(updateTable, 10000);
+    } else {
+      document.body.innerHTML = "<h3>Chỉ hỗ trợ trên điện thoại!</h3>";
+    }
+  </script>
+</body>
+</html>
