@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>QR & Barcode Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body { font-family: sans-serif; text-align: center; }
+    #reader { width: 300px; margin: auto; }
+    input, button { margin: 10px; padding: 8px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h2>Quét mã sản phẩm</h2>
+
+  <label>Người quét:</label><br>
+  <input type="text" id="scannerName" placeholder="Nhập tên của bạn"><br>
+
+  <div id="reader"></div>
+  <div id="result"></div>
+
+  <script>
+    const sheetAPI = "https://script.google.com/macros/s/AKfycbzO2O7qL48_tES3k18oNqKr7ys6EwSksLcwFK9R5LuZIrEixfNKuYEGALxXHPk_reY/exec";
+	
+    function showPopup(message) {
+      alert(message);
+    }
+
+    function sendToSheet(code, name) {
+      const url = `${sheetAPI}?code=${encodeURIComponent(code)}&name=${encodeURIComponent(name)}`;
+      fetch(url)
+        .then(res => res.json())
+        .then(response => {
+          if (response.status === "ok") {
+            showPopup("Thêm thành công!");
+          } else if (response.status === "duplicate") {
+            showPopup("Dữ liệu đã tồn tại!");
+          } else {
+            showPopup("Lỗi: " + response.message);
+          }
+        })
+        .catch(error => showPopup("Lỗi gửi dữ liệu: " + error));
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+      html5QrcodeScanner.clear();
+      const name = document.getElementById("scannerName").value.trim();
+      if (!name) {
+        showPopup("Vui lòng nhập tên người quét!");
+        return;
+      }
+
+      document.getElementById("result").innerText = "Đã quét: " + decodedText;
+      sendToSheet(decodedText, name);
+    }
+
+    const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 }, false);
+    html5QrcodeScanner.render(onScanSuccess);
+  </script>
+</body>
+</html>
