@@ -282,10 +282,7 @@
       else if (diff > 50) document.getElementById("wrapper").style.transform = "translateX(0vw)";
     });
 	
-	document.getElementById("limitSelect").addEventListener("change", (e) => {
-	  currentLimit = parseInt(e.target.value, 10);
-	  updateTable();
-	});
+	
 
 	// Lấy dữ liệu lần đầu
 	updateTable();
