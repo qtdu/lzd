@@ -82,7 +82,7 @@
 	top: 5px;
 	left: 100vw;
 	width: 100vw;
-	height: 400px;
+	height: 600px;
 	/*display: none;*/
 	overflow: hidden;
 	}
@@ -225,6 +225,66 @@
 			"scrollCollapse": false,
 			"order": [[0, "asc"]],
 			"autoWidth": false, // Ngăn cột bị cố định sai kích thước
+		  pageLength: 10,
+		  lengthMenu: [5, 10, 20],
+		  responsive: true,
+		  
+		  language: {
+			lengthMenu: "Hiển thị _MENU_ dòng",
+			search: "Tìm:",
+			info: "Đang hiển thị _START_ đến _END_ trong tổng số _TOTAL_ dòng",
+			paginate: {
+			  first: "<<",
+			  last: ">>",
+			  next: ">",
+			  previous: "<"
+			},
+			infoEmpty: "Không có dữ liệu",
+			zeroRecords: "Không tìm thấy kết quả",
+			//"fixedColumns": {
+			//	"left": 1,
+			//	"right": 1
+			//},
+			"data": defaultDataT
+		  },
+		  initComplete: function() {
+			// Tùy chỉnh giao diện sau khi DataTables được khởi tạo
+			setTimeout(() => {
+			  $('.dataTables_filter label').css({
+				'white-space': 'nowrap',
+				'margin-left': 'auto',
+				'display': 'flex',
+				'align-items': 'center'
+			  });
+
+			  $('.dataTables_filter input').css({
+				'width': '120px',
+				'margin-left': '6px',
+				'padding': '4px'
+			  });
+
+			  $('.dataTables_length').css({
+				'display': 'flex',
+				'align-items': 'center',
+				'gap': '6px'
+			  });
+
+			  // Gộp cả phần length và search vào 1 hàng
+			  $('.dataTables_wrapper .dataTables_filter').prependTo('.dataTables_wrapper .dataTables_length').css({
+				'margin-left': 'auto'
+			  });
+			}, 0);
+		  }
+		});
+	/*
+		tableQ = $('#myTableQ').DataTable({
+			"paging": true,
+			"searching": true,
+			"scrollX": true,
+			"scrollY": "350px",
+			"scrollCollapse": false,
+			"order": [[0, "asc"]],
+			"autoWidth": false, // Ngăn cột bị cố định sai kích thước
 			"pageLength": 200,
 			"lengthMenu": [10, 50, 100, 200],
 			//"fixedColumns": {
@@ -233,7 +293,7 @@
 			//},
 			"data": defaultDataT
 		});
-
+	*/
 		// Cập nhật header khi cửa sổ thay đổi kích thước
 		$(window).on('resize', function () {
 			setTimeout(function () {
