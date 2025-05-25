@@ -138,7 +138,7 @@
     </div>
 	-->
 	<div id="DataQ">
-		<div id="TNQ">...</div>
+		<div id="TNQ">kết quả scan</div>
 		<table id="myTableQ" class="display">
 			<thead>
 				<tr><th>Người</th><th>Mã</th><th>Thời gian</th></tr>
@@ -252,37 +252,66 @@
 			//},
 			"data": defaultDataT
 		  },
+		  
 		  initComplete: function() {
-    // Sau khi khởi tạo xong
 				setTimeout(() => {
-				  // Bọc cả phần length + search vào một hàng
 				  const wrapper = $('.dataTables_wrapper');
+
+				  // 👉 Dòng trên: length + filter
 				  const topRow = $('<div class="dtable-top-row"></div>').css({
 					display: 'flex',
 					justifyContent: 'space-between',
 					alignItems: 'center',
 					marginBottom: '10px',
+					paddingLeft: '8px',
+					paddingRight: '8px',
 					flexWrap: 'wrap'
 				  });
 
-				  topRow.append(wrapper.find('.dataTables_length'));
-				  topRow.append(wrapper.find('.dataTables_filter'));
-				  wrapper.find('.dataTables_length, .dataTables_filter').css({ margin: 0 });
-
-				  wrapper.find('.dataTables_length, .dataTables_filter input').css({
-					fontSize: '14px',
+				  // Căn trái + phải
+				  wrapper.find('.dataTables_length').css({
+					marginRight: 'auto'
 				  });
 
-				  // Đưa hàng topRow vào đầu bảng
-				  wrapper.prepend(topRow);
+				  wrapper.find('.dataTables_filter').css({
+					marginLeft: 'auto'
+				  });
 
-				  // Tùy chỉnh ô tìm kiếm nhỏ gọn hơn
+				  // Giảm size ô tìm kiếm
 				  wrapper.find('.dataTables_filter input').css({
 					width: '120px',
 					marginLeft: '6px',
 					padding: '4px'
 				  });
 
+				  topRow.append(wrapper.find('.dataTables_length'));
+				  topRow.append(wrapper.find('.dataTables_filter'));
+
+				  wrapper.prepend(topRow);
+
+				  // 👉 Dòng dưới: info + paginate
+				  const bottomRow = $('<div class="dtable-bottom-row"></div>').css({
+					display: 'flex',
+					justifyContent: 'space-between',
+					alignItems: 'center',
+					marginTop: '10px',
+					paddingLeft: '8px',
+					paddingRight: '8px',
+					flexWrap: 'wrap'
+				  });
+
+				  wrapper.find('.dataTables_info').css({
+					marginRight: 'auto'
+				  });
+
+				  wrapper.find('.dataTables_paginate').css({
+					marginLeft: 'auto'
+				  });
+
+				  bottomRow.append(wrapper.find('.dataTables_info'));
+				  bottomRow.append(wrapper.find('.dataTables_paginate'));
+
+				  wrapper.append(bottomRow);
 				}, 0);
 			  }
 		});
