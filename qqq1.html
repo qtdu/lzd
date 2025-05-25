@@ -165,6 +165,7 @@
 	  fetch(appScriptUrl + "?table=1&t=" + Date.now())
 		.then(res => res.json())
 		.then(data => {
+			alert(data.data)
 		  new gridjs.Grid({
 			columns: ["Người", "Mã", "Thời gian"],
 			data: data.data,
