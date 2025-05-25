@@ -199,14 +199,15 @@
         }).catch(err => statusDiv.textContent = "Lỗi gửi!");
     }
 
-	
+	h_window = window.innerHeight;
+	h_table = (h_window - 165) + "px"
 	let tableQ;
 	function CreateTable(defaultDataT) {
 		tableQ = $('#myTableQ').DataTable({
 			"paging": true,
 			"searching": true,
 			"scrollX": true,
-			"scrollY": "500px",
+			"scrollY": h_table, //"500px"
 			"scrollCollapse": false,
 			"order": [[0, "asc"]],
 			"autoWidth": false, // Ngăn cột bị cố định sai kích thước
@@ -362,8 +363,8 @@
       else if (diff > 50) document.getElementById("wrapper").style.transform = "translateX(0vw)";
     });
 	
-	
-	alert(window.innerHeight);
+	//alert(window.innerHeight);
+
 	// Lấy dữ liệu lần đầu
 	updateTable();
 
