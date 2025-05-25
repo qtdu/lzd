@@ -85,6 +85,7 @@
 	height: 600px;
 	/*display: none;*/
 	overflow: hidden;
+	border: solid;
 	}
 		
 	.dataTables_wrapper {
@@ -197,27 +198,7 @@
 		  updateTable();
         }).catch(err => statusDiv.textContent = "Lỗi gửi!");
     }
-	/*
-    function updateTable() {
-      fetch(appScriptUrl + "?table=1&t=" + Date.now())
-        .then(res => res.json())
-        .then(rows => {
-          const tbody = document.querySelector("#data-table tbody");
-          tbody.innerHTML = "";
-          rows.forEach(row => {
-            const tr = document.createElement("tr");
-            row.forEach(cell => {
-              const td = document.createElement("td");
-              td.textContent = cell;
-              tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
-          });
-        });
-    }
-	setInterval(updateTable, 10000);
-	*/
-	
+
 	
 	let tableQ;
 	function CreateTable(defaultDataT) {
@@ -225,7 +206,7 @@
 			"paging": true,
 			"searching": true,
 			"scrollX": true,
-			"scrollY": "450px",
+			"scrollY": "500px",
 			"scrollCollapse": false,
 			"order": [[0, "asc"]],
 			"autoWidth": false, // Ngăn cột bị cố định sai kích thước
@@ -360,7 +341,7 @@
 		.then(res => res.json())
 		.then(datarows => {
 		  //renderTable(rows);
-		  alert(datarows)
+		  //alert(datarows)
 		  tableQ.clear().rows.add(datarows).draw();
 		  
 		  
@@ -387,7 +368,7 @@
 	updateTable();
 
 	// Cập nhật mỗi 10s
-	//setInterval(updateTable, 5000);
+	setInterval(updateTable, 5000);
     
 
     // Từ chối nếu không dùng trên điện thoại
