@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>QR & Barcode Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+    #wrapper {
+      display: flex;
+      width: 200vw;
+      transition: transform 0.5s ease;
+    }
+    .screen {
+      width: 100vw;
+      height: 100vh;
+      box-sizing: border-box;
+      padding: 10px;
+      /*overflow: auto;*/
+	  /*overflow-y: auto;*/
+    }
+    #scanner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+	/*
+	.qr-reader-store {
+		width: 100vw;
+		height: 80vw;
+		overflow: hidden;
+	}
+    #qr-reader {
+		margin-top: -20px;
+		margin-bottom: -20px;
+      width: 300px;
+      max-width: 100%;
+    }
+	*/
+	.qr-reader-store {
+	  width: 100vw;
+	  height: 80vw;
+	  overflow: hidden;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  position: relative;
+	  background: #000;
+	}
+
+	#qr-reader {
+		position: relative;
+		width: 100vw;
+		height: 100vw; /* Chiều cao bằng chiều rộng => 1:1 */
+		overflow: hidden;
+		background-color: #000;
+	  }
+
+	  #qr-reader video {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: auto;
+		height: 100%;
+		transform: translate(-50%, -50%);
+		object-fit: cover;
+	  }
+	
+    #result {
+      width: 100%;
+      height: 100px;
+      margin-top: 10px;
+    }
+	
+	/*
+	#data-Table {
+		max-height: 60vh; /* Giới hạn chiều cao khung bảng */
+		overflow-y: auto;
+		overflow-x: hidden;
+		margin-top: 10px;
+		-webkit-overflow-scrolling: touch;
+		
+		
+		position: relative;
+	}
+	
+
+	  /* Tránh vuốt ngang trên bảng gây hiểu nhầm */
+	  #data-Table {
+		touch-action: pan-y !important; /* Chỉ cho vuốt dọc, tránh vuốt ngang */
+	  }
+	*/  
+	  
+	#dataTable_wrapper {
+      margin-top: 20px;
+    }
+
+    table.dataTable thead th {
+      position: sticky;
+      top: 0;
+      background-color: #f8f8f8;
+    }
+
+    table {
+      width: 100% !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+      font-size: 14px;
+      padding: 4px 8px;
+    }
+
+    .dataTables_length label,
+    .dataTables_filter label,
+    .dataTables_info {
+      font-size: 14px;
+    }
+
+    /* Giảm font chữ phần phân trang */
+    .dataTables_info,
+    .dataTables_paginate {
+      font-size: 12px;
+    }
+	  
+	
+	select, .sendData {
+      font-size: 18px;
+      padding: 6px;
+      width: 100%;
+      margin: 6px 0;
+    }
+	.gridjs-summary {
+    font-size: 12px;
+    margin-right: 10px;
+  }
+
+  
+  
+
+
+
+
+  
+  </style>
+</head>
+<body>
+  <div id="wrapper">
+    <div class="screen" id="scanner">
+      <select id="user-select"></select>
+	  <div id="qr-reader-store">
+		<div id="qr-reader"></div>
+	  </div>
+      <textarea id="result" placeholder="Các mã đã quét..."></textarea>
+      <button class="sendData" onclick="sendData()">Gửi</button>
+      <div id="status"></div>
+    </div>
+	<!--
+    <div class="screen" id="table-screen">
+      <table id="data-table">
+        <thead><tr><th>Người</th><th>Mã</th><th>Thời gian</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+	-->
+	<div class="screen" id="table-Screen">
+		<h2>Dữ liệu đã quét</h2>
+		<table id="dataTable" class="display">
+			<thead>
+			  <tr>
+				<th>Người</th>
+				<th>Mã</th>
+				<th>Thời gian</th>
+			  </tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	  
+  </div>
+  <script>
+    const appScriptUrl = "https://script.google.com/macros/s/AKfycbw_R_2iW_JXrh3UNrp2jEk3Gmjr-gzAVW-98fmLlRB4WcYU4FwP2mBRzipBZNph1Ys/exec"; // Thay bằng URL Web App
+
+    const resultArea = document.getElementById("result");
+    const userSelect = document.getElementById("user-select");
+    const statusDiv = document.getElementById("status");
+
+    // Tự động phát hiện camera sau
+    let cameraId = null;
+    Html5Qrcode.getCameras().then(devices => {
+      const backCam = devices.find(d => d.label.toLowerCase().includes("back")) || devices[0];
+      cameraId = backCam.id;
+      startScanner();
+    });
+
+    function startScanner() {
+      const qrScanner = new Html5Qrcode("qr-reader");
+      qrScanner.start(cameraId, { fps: 10, qrbox: { width: 250, height: 250 } }, (decodedText) => {
+        if (!resultArea.value.includes(decodedText)) {
+          resultArea.value += decodedText + "\n";
+        }
+      });
+    }
+
+    // Lấy danh sách người quét
+    fetch(appScriptUrl)
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(name => {
+          const opt = document.createElement("option");
+          opt.value = name;
+          opt.textContent = name;
+          userSelect.appendChild(opt);
+        });
+      });
+
+    function sendData() {
+      const codes = resultArea.value.trim();
+      const user = userSelect.value;
+      if (!codes || !user) return alert("Chọn người và có mã để gửi.");
+      fetch(appScriptUrl, {
+        method: "POST",
+        body: JSON.stringify({ user, codes })
+      }).then(res => res.text())
+        .then(msg => {
+          statusDiv.textContent = msg;
+          resultArea.value = "";
+		  updateTable();
+        }).catch(err => statusDiv.textContent = "Lỗi gửi!");
+    }
+	
+	
+
+    // Vuốt chuyển màn hình
+    let startX = 0;
+    document.body.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+    document.body.addEventListener("touchend", e => {
+      let diff = e.changedTouches[0].clientX - startX;
+      if (diff < -50) document.getElementById("wrapper").style.transform = "translateX(-100vw)";
+      else if (diff > 50) document.getElementById("wrapper").style.transform = "translateX(0vw)";
+    });
+	
+	document.getElementById("limitSelect").addEventListener("change", (e) => {
+	  currentLimit = parseInt(e.target.value, 10);
+	  //updateTable();
+	});
+
+	
+	
+	let dataTableInstance;
+
+  async function loadTableData() {
+    try {
+      const res = await fetch(appScriptUrl + '?table=1&t=' + Date.now());
+      const data = await res.json();
+
+      if (dataTableInstance) {
+        // Cập nhật bảng đã tồn tại
+        dataTableInstance.clear().rows.add(data).draw();
+      } else {
+        // Khởi tạo bảng lần đầu
+        dataTableInstance = $('#dataTable').DataTable({
+          data: data,
+          columns: [
+            { title: "Người" },
+            { title: "Mã" },
+            { title: "Thời gian" }
+          ],
+          pageLength: 10,
+          language: {
+            search: "Tìm kiếm:",
+            lengthMenu: "Hiển thị _MENU_ dòng",
+            info: "Hiển thị _START_ đến _END_ trong tổng _TOTAL_ dòng",
+            paginate: {
+              previous: "<",
+              next: ">"
+            }
+          }
+        });
+      }
+    } catch (err) {
+      console.error("Lỗi khi tải dữ liệu:", err);
+    }
+  }
+
+  $(document).ready(function () {
+    loadTableData();
+    setInterval(loadTableData, 10000); // cập nhật mỗi 10s
+  });
+	
+    
+
+    // Từ chối nếu không dùng trên điện thoại
+    if (!/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      document.body.innerHTML = "<h2>Chỉ dùng được trên điện thoại.</h2>";
+    }
+  </script>
+</body>
+</html>
