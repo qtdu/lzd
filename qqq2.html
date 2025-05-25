@@ -343,7 +343,11 @@
 		.then(datarows => {
 		  //renderTable(rows);
 		  //alert(datarows)
-		  tableQ.clear().rows.add(datarows).draw();
+		  var currentPage = table.page(); // lưu lại trang hiện tại
+
+			tableQ.clear().rows.add(datarows).draw(false); // false => không reset trang
+			tableQ.page(currentPage).draw(false); // trở lại trang cũ nếu cần chắc chắn
+		  //tableQ.clear().rows.add(datarows).draw();
 		  
 		  
 		})
