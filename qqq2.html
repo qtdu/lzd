@@ -176,9 +176,9 @@
       qrScanner.start(cameraId, { fps: 10, qrbox: { width: 250, height: 250 } }, (decodedText) => {
         if (!resultArea.value.includes(decodedText)) {
 			if (regex.test(decodedText)) {
-				resultArea.value += decodedText + "\n";
+				resultArea.value = decodedText + "\n" + resultArea.value;
 			  } 
-          resultArea.value += decodedText + "\n";
+          //resultArea.value += decodedText + "\n";
         }
       });
     }
