@@ -76,6 +76,9 @@
       width: 100%;
       margin: 6px 0;
     }
+	.sendData {
+		display: none;
+	}
 	
 	#DataQ {
 	position: fixed;
@@ -125,13 +128,13 @@
       <select id="user-select"></select>
 	  <div id="password-group" style="margin-top: 5px; margin-bottom: 10px; display: flex; gap: 5px;  align-items: center;">
 		  <input type="password" id="passwordInput" placeholder="Nhập mật khẩu" style="flex: 1; padding: 5px; width: 60vw" />
-		  <button id="confirmButton" style="padding: 6px 12px; width: calc(40vw - 24px - 10px)">Xác nhận</button>
+		  <button id="confirmButton" style="padding: 6px 12px; width: calc(40vw - 24px - 10px); ">Xác nhận</button>
 	  </div>
 	  <div id="qr-reader-store">
 		<div id="qr-reader"></div>
 	  </div>
       <textarea id="result" placeholder="Các mã đã quét..."></textarea>
-      <button class="sendData" onclick="sendData()">Gửi</button>
+      <button id="sendData" class="sendData" onclick="sendData()">Gửi</button>
       <div id="status"></div>
     </div>
 	<!--
@@ -175,18 +178,18 @@
         }
       });
     }
-
+	
+	let dsSudung;
     // Lấy danh sách người quét
     fetch(appScriptUrl)
       .then(res => res.json())
       .then(data => {
-		
+		dsSudung = data
         data.forEach(name => {
-			alert(name[0])
-			return
+			
           const opt = document.createElement("option");
-          opt.value = name;
-          opt.textContent = name;
+          opt.value = name[0];
+          opt.textContent = name[0];
           userSelect.appendChild(opt);
         });
       });
@@ -369,6 +372,22 @@
 	// Cập nhật mỗi 10s
 	setInterval(updateTable, 5000);
     
+	document.getElementById('user-select').addEventListener('change', function () {
+		document.getElementById('passwordInput').value = "";
+		//document.getElementById('sendData').style.display = "inline-block";
+	}
+	document.getElementById('confirmButton').addEventListener('click', function () {
+		pass = document.getElementById('passwordInput').value;
+		usr = document.getElementById('user-select').value;
+		for(i=0;i<dsSudung.length;i++){
+			if(dsSudung[i][0] == usr && dsSudung[i][1] == pass) {
+				document.getElementById('sendData').style.display = "inline-block";
+				break;
+			}
+		}
+		//document.getElementById('sendData').style.display = "inline-block";
+	}
+	
 
     // Từ chối nếu không dùng trên điện thoại
     if (!/Android|iPhone|iPad/i.test(navigator.userAgent)) {
