@@ -369,7 +369,7 @@
     document.body.addEventListener("touchend", e => {
       let diff = e.changedTouches[0].clientX - startX;
       if (diff < -50) document.getElementById("wrapper").style.transform = "translateX(-100vw)";
-      //else if (diff > 50) document.getElementById("wrapper").style.transform = "translateX(0vw)";
+      else if (diff > 50) document.getElementById("wrapper").style.transform = "translateX(0vw)";
     });
 	
 	function returnMain() {
