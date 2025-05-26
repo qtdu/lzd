@@ -129,6 +129,10 @@
 	<audio id="sound-fail" preload="auto">
 	  <source src="2.mp3" type="audio/mp3">
 	</audio>
+	<audio id="sound-duplicate" preload="auto">
+	  <source src="3.mp3" type="audio/mp3">
+	</audio>
+	
   <div id="wrapper">
     <div class="screen" id="scanner">
       <select id="user-select"></select>
@@ -143,14 +147,7 @@
       <button id="sendData" class="sendData" onclick="sendData()">Gửi</button>
       <div id="status"></div>
     </div>
-	<!--
-    <div class="screen" id="table-screen">
-      <table id="data-table">
-        <thead><tr><th>Người</th><th>Mã</th><th>Thời gian</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-	-->
+	
 	<div id="DataQ">
 		<div id="TNQ" onclick="returnMain()">kết quả scan</div>
 		<table id="myTableQ" class="display">
@@ -189,7 +186,7 @@
 			  }
           
         }else{
-			//document.getElementById("sound-fail").play();
+			document.getElementById("sound-duplicate").play();
 		}
       });
     }
