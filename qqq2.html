@@ -180,9 +180,10 @@
     fetch(appScriptUrl)
       .then(res => res.json())
       .then(data => {
-		alert(data);
-		return
+		
         data.forEach(name => {
+			alert(name[0])
+			return
           const opt = document.createElement("option");
           opt.value = name;
           opt.textContent = name;
