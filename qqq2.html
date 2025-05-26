@@ -123,6 +123,12 @@
   </style>
 </head>
 <body>
+	<audio id="sound-success" preload="auto">
+	  <source src="1.mp3" type="audio/mp3">
+	</audio>
+	<audio id="sound-fail" preload="auto">
+	  <source src="2.mp3" type="audio/mp3">
+	</audio>
   <div id="wrapper">
     <div class="screen" id="scanner">
       <select id="user-select"></select>
@@ -176,10 +182,15 @@
       qrScanner.start(cameraId, { fps: 10, qrbox: { width: 250, height: 250 } }, (decodedText) => {
         if (!resultArea.value.includes(decodedText)) {
 			if (regex.test(decodedText)) {
-				resultArea.value = decodedText + "\n" + resultArea.value;
-			  } 
-          //resultArea.value += decodedText + "\n";
-        }
+				resultArea.value += decodedText + "\n";
+				document.getElementById("sound-success").play();
+			  } else {
+				document.getElementById("sound-fail").play();
+			  }
+          
+        }else{
+			//document.getElementById("sound-fail").play();
+		}
       });
     }
 	
