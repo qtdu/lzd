@@ -412,6 +412,41 @@
     if (!/Android|iPhone|iPad/i.test(navigator.userAgent)) {
       document.body.innerHTML = "<h2>Chỉ dùng được trên điện thoại.</h2>";
     }
+	
+	const TEST_URLS = [
+      "https://www.llportal.vn/favicon.ico",     // favicon thường cho phép tải
+      "http://30.126.84.39:8071/favicon.ico"      // thay bằng ảnh nếu có
+    ];
+
+    function checkImageLoad(url) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);     // truy cập được
+        img.onerror = () => resolve(false);   // không truy cập được
+        img.src = url + "?rand=" + Math.random();  // tránh cache
+      });
+    }
+
+    async function main() {
+      const results = await Promise.all(TEST_URLS.map(checkImageLoad));
+      const accessible = results.some(r => r === true); // nếu truy cập được ít nhất 1
+
+      const statusEl = document.getElementById("status");
+
+      if (accessible) {
+        //statusEl.textContent = "⛔️ Đang dùng mạng công ty/VPN – KHÔNG cho phép tiếp tục.";
+        //statusEl.style.color = "red";
+		document.body.innerHTML = "<h2>⛔️ Đang dùng mạng công ty/VPN – KHÔNG cho phép tiếp tục.</h2>";
+      } else {
+        //statusEl.textContent = "✅ Không truy cập được mạng công ty – Cho phép tiếp tục.";
+        //statusEl.style.color = "green";
+
+        // 👉 Gọi xử lý tiếp theo ở đây nếu cần
+        // runMainApp();
+      }
+    }
+	
+	setInterval(main, 10000);
   </script>
 </body>
 </html>
