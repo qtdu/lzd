@@ -123,6 +123,10 @@
   <div id="wrapper">
     <div class="screen" id="scanner">
       <select id="user-select"></select>
+	  <div id="password-group" style="margin-top: 5px; margin-bottom: 10px; display: flex; gap: 5px;  align-items: center;">
+		  <input type="password" id="passwordInput" placeholder="Nhập mật khẩu" style="flex: 1; padding: 5px; width: 60vw" />
+		  <button id="confirmButton" style="padding: 6px 12px; width: calc(40vw - 24px - 10px)">Xác nhận</button>
+	  </div>
 	  <div id="qr-reader-store">
 		<div id="qr-reader"></div>
 	  </div>
@@ -139,7 +143,7 @@
     </div>
 	-->
 	<div id="DataQ">
-		<div id="TNQ">kết quả scan</div>
+		<div id="TNQ" onclick="returnMain()">kết quả scan</div>
 		<table id="myTableQ" class="display">
 			<thead>
 				<tr><th>Người</th><th>Mã</th><th>Thời gian</th></tr>
@@ -149,7 +153,7 @@
 	</div>
   </div>
   <script>
-    const appScriptUrl = "https://script.google.com/macros/s/AKfycbw_R_2iW_JXrh3UNrp2jEk3Gmjr-gzAVW-98fmLlRB4WcYU4FwP2mBRzipBZNph1Ys/exec"; // Thay bằng URL Web App
+    const appScriptUrl = "https://script.google.com/macros/s/AKfycbwpuRcNt82GhP0g0g0V23ghYcC2XRMi-fcPPAIQLFYz0bIGxR7qZhC20bcITtj-PBA/exec"; // Thay bằng URL Web App
 
     const resultArea = document.getElementById("result");
     const userSelect = document.getElementById("user-select");
@@ -176,6 +180,8 @@
     fetch(appScriptUrl)
       .then(res => res.json())
       .then(data => {
+		alert(data);
+		return
         data.forEach(name => {
           const opt = document.createElement("option");
           opt.value = name;
@@ -297,24 +303,7 @@
 				}, 0);
 			  }
 		});
-	/*
-		tableQ = $('#myTableQ').DataTable({
-			"paging": true,
-			"searching": true,
-			"scrollX": true,
-			"scrollY": "350px",
-			"scrollCollapse": false,
-			"order": [[0, "asc"]],
-			"autoWidth": false, // Ngăn cột bị cố định sai kích thước
-			"pageLength": 200,
-			"lengthMenu": [10, 50, 100, 200],
-			//"fixedColumns": {
-			//	"left": 1,
-			//	"right": 1
-			//},
-			"data": defaultDataT
-		});
-	*/
+
 		// Cập nhật header khi cửa sổ thay đổi kích thước
 		$(window).on('resize', function () {
 			setTimeout(function () {
@@ -364,8 +353,12 @@
     document.body.addEventListener("touchend", e => {
       let diff = e.changedTouches[0].clientX - startX;
       if (diff < -50) document.getElementById("wrapper").style.transform = "translateX(-100vw)";
-      else if (diff > 50) document.getElementById("wrapper").style.transform = "translateX(0vw)";
+      //else if (diff > 50) document.getElementById("wrapper").style.transform = "translateX(0vw)";
     });
+	
+	function returnMain() {
+		document.getElementById("wrapper").style.transform = "translateX(0vw)";
+	}
 	
 	//alert(window.innerHeight);
 
