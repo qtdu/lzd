@@ -157,7 +157,8 @@
   </div>
   <script>
     const appScriptUrl = "https://script.google.com/macros/s/AKfycbyAZCvvfeaSKt8632KzpbVaphVsKEJuLQ4k-isAAGzfAta13o5PXIyw74_4ieHlyvU/exec"; // Thay bằng URL Web App
-
+	const regex = /^\d{4}-\d{4}$/;
+	
     const resultArea = document.getElementById("result");
     const userSelect = document.getElementById("user-select");
     const statusDiv = document.getElementById("status");
@@ -174,6 +175,9 @@
       const qrScanner = new Html5Qrcode("qr-reader");
       qrScanner.start(cameraId, { fps: 10, qrbox: { width: 250, height: 250 } }, (decodedText) => {
         if (!resultArea.value.includes(decodedText)) {
+			if (regex.test(decodedText)) {
+				resultArea.value += decodedText + "\n";
+			  } 
           resultArea.value += decodedText + "\n";
         }
       });
@@ -374,16 +378,23 @@
     
 	document.getElementById('user-select').addEventListener('change', function () {
 		document.getElementById('passwordInput').value = "";
-		//document.getElementById('sendData').style.display = "inline-block";
+		document.getElementById('sendData').style.display = "none";
 	});
 	document.getElementById('confirmButton').addEventListener('click', function () {
 		pass = document.getElementById('passwordInput').value;
 		usr = document.getElementById('user-select').value;
+		timthay = false
 		for(i=0;i<dsSudung.length;i++){
 			if(dsSudung[i][0] == usr && dsSudung[i][1] == pass) {
 				document.getElementById('sendData').style.display = "inline-block";
+				timthay = true
 				break;
 			}
+		}
+		if(timthay == false) {
+			alert("Không đúng mật khẩu, bạn phải nhập lại")
+			document.getElementById('passwordInput').value = "";
+			document.getElementById('passwordInput').focus();
 		}
 		//document.getElementById('sendData').style.display = "inline-block";
 	});
