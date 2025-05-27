@@ -2,55 +2,81 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>QR Scanner liên tục</title>
+  <title>QR/Barcode Scanner</title>
   <style>
     body {
-      text-align: center;
+      margin: 0;
       font-family: sans-serif;
+      background: #000;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #video-container {
+      position: relative;
+      width: 100vw;
+      height: 60vh;
+      overflow: hidden;
     }
 
     #video {
       width: 100%;
-      max-width: 360px;
-      height: auto;
-      border: 4px solid #4CAF50;
-      border-radius: 12px;
-      margin-top: 20px;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #focus-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 80%;
+      height: 30%;
+      transform: translate(-50%, -50%);
+      border: 4px solid lime;
+      border-radius: 8px;
+      box-sizing: border-box;
+      pointer-events: none;
     }
 
     textarea {
-      margin-top: 20px;
+      margin-top: 16px;
       width: 90%;
-      height: 200px;
-      font-size: 1.2rem;
+      height: 180px;
+      font-size: 1.1rem;
     }
   </style>
 </head>
 <body>
-  <h2>📷 Quét QR liên tục</h2>
-  <video id="video" autoplay muted playsinline></video>
-  <textarea id="resultArea" placeholder="Kết quả sẽ hiển thị ở đây..."></textarea>
+  <h2>📷 Quét mã</h2>
+  <div id="video-container">
+    <video id="video" autoplay muted playsinline></video>
+    <div id="focus-box"></div>
+  </div>
+
+  <textarea id="resultArea" placeholder="Kết quả hiển thị ở đây..."></textarea>
 
   <!-- Âm thanh -->
   <audio id="sound-success" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_b19cba9506.mp3" preload="auto"></audio>
   <audio id="sound-duplicate" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_736dbf50c8.mp3" preload="auto"></audio>
 
-  <!-- QR Scanner script -->
+  <!-- QR Scanner -->
   <script src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
   <script>
     QrScanner.WORKER_PATH = 'https://unpkg.com/qr-scanner@1.4.2/qr-scanner-worker.min.js';
 
     const videoElem = document.getElementById('video');
     const resultArea = document.getElementById('resultArea');
-    const scannedList = new Set();
+    const scannedSet = new Set();
 
     const soundSuccess = document.getElementById('sound-success');
     const soundDuplicate = document.getElementById('sound-duplicate');
 
     const scanner = new QrScanner(videoElem, result => {
       const text = typeof result === 'string' ? result : result.data || String(result);
-      if (!scannedList.has(text)) {
-        scannedList.add(text);
+      if (!scannedSet.has(text)) {
+        scannedSet.add(text);
         resultArea.value += text + "\n";
         soundSuccess.play();
       } else {
