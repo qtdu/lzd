@@ -31,6 +31,10 @@
   <video id="video" autoplay muted playsinline></video>
   <textarea id="resultArea" placeholder="Kết quả sẽ hiển thị ở đây..."></textarea>
 
+  <!-- Âm thanh -->
+  <audio id="sound-success" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_b19cba9506.mp3" preload="auto"></audio>
+  <audio id="sound-duplicate" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_736dbf50c8.mp3" preload="auto"></audio>
+
   <!-- QR Scanner script -->
   <script src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
   <script>
@@ -38,12 +42,19 @@
 
     const videoElem = document.getElementById('video');
     const resultArea = document.getElementById('resultArea');
-    const scannedList = new Set(); // để tránh trùng lặp
+    const scannedList = new Set();
+
+    const soundSuccess = document.getElementById('sound-success');
+    const soundDuplicate = document.getElementById('sound-duplicate');
 
     const scanner = new QrScanner(videoElem, result => {
-      if (!scannedList.has(result)) {
-        scannedList.add(result);
-        resultArea.value += result + "\n";
+      const text = typeof result === 'string' ? result : result.data || String(result);
+      if (!scannedList.has(text)) {
+        scannedList.add(text);
+        resultArea.value += text + "\n";
+        soundSuccess.play();
+      } else {
+        soundDuplicate.play();
       }
     }, {
       highlightScanRegion: true,
