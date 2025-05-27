@@ -118,9 +118,10 @@
 	<audio id="sound-duplicate" preload="auto">
 	  <source src="3.mp3" type="audio/mp3">
 	</audio>
+	<!--
 	<audio id="sound-success" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_b19cba9506.mp3" preload="auto"></audio>
 	<audio id="sound-duplicate" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_736dbf50c8.mp3" preload="auto"></audio>
-	
+	-->
   <div id="wrapper">
     <div class="screen" id="scanner">
       <select id="user-select"></select>
@@ -157,6 +158,7 @@
   <script>
     const appScriptUrl = "https://script.google.com/macros/s/AKfycbwjcv9i0zu2wjP-6xocYxMk4m8cIiUVgTuVBRgOSLd5ss-QZn0FPfC6ZPJMPfX6EiY/exec"; // Thay bằng URL Web App
 	const regex = /^\d{4}-\d{4}$/;
+	
 	
     const resultArea = document.getElementById("result");
     const userSelect = document.getElementById("user-select");
@@ -222,7 +224,8 @@
     QrScanner.WORKER_PATH = 'https://unpkg.com/qr-scanner@1.4.2/qr-scanner-worker.min.js';
 
     const videoElem = document.getElementById('video');
-    const resultArea = document.getElementById('resultArea');
+    
+	
     const scannedSet = new Set();
 
     const soundSuccess = document.getElementById('sound-success');
