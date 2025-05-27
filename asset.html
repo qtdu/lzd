@@ -140,9 +140,14 @@
 		  <input type="password" id="passwordInput" placeholder="Nhập mật khẩu" style="flex: 1; padding: 5px; width: 60vw" />
 		  <button id="confirmButton" style="padding: 6px 12px; width: calc(40vw - 24px - 10px); ">Xác nhận</button>
 	  </div>
+	  
 	  <div id="qr-reader-store">
 		<div id="qr-reader"></div>
 	  </div>
+	  <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+		  <select id="camera-select"></select>
+		  <button onclick="startScanner()">Bắt đầu quét</button>
+		</div>
       <textarea id="result" placeholder="Các mã đã quét..."></textarea>
       <button id="sendData" class="sendData" onclick="sendData()">Gửi</button>
       <div id="status"></div>
@@ -165,7 +170,7 @@
     const resultArea = document.getElementById("result");
     const userSelect = document.getElementById("user-select");
     const statusDiv = document.getElementById("status");
-
+	/*
     // Tự động phát hiện camera sau
     let cameraId = null;
     Html5Qrcode.getCameras().then(devices => {
@@ -188,6 +193,63 @@
         }else{
 			document.getElementById("sound-duplicate").play();
 		}
+      });
+    }
+	*/
+	
+	let cameraId = null;
+    let qrScanner = null;
+    const resultArea = document.getElementById("resultArea");
+    const regex = /^[A-Z0-9\-]+$/i; // Điều kiện hợp lệ (có thể chỉnh sửa)
+
+    // Lấy danh sách camera và đổ vào select
+    Html5Qrcode.getCameras().then(devices => {
+      const select = document.getElementById("camera-select");
+      devices.forEach(device => {
+        const option = document.createElement("option");
+        option.value = device.id;
+        option.text = device.label || `Camera ${select.length + 1}`;
+        select.appendChild(option);
+      });
+    }).catch(err => {
+      alert("Không tìm thấy camera nào: " + err);
+    });
+
+    function startScanner() {
+      if (qrScanner) {
+        qrScanner.stop().then(() => {
+          qrScanner.clear();
+          runScanner();
+        });
+      } else {
+        runScanner();
+      }
+    }
+
+    function runScanner() {
+      cameraId = document.getElementById("camera-select").value;
+      qrScanner = new Html5Qrcode("qr-reader");
+
+      qrScanner.start(
+        cameraId,
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          if (!resultArea.value.includes(decodedText)) {
+            if (regex.test(decodedText)) {
+              resultArea.value += decodedText + "\n";
+              document.getElementById("sound-success").play();
+            } else {
+              document.getElementById("sound-fail").play();
+            }
+          } else {
+            document.getElementById("sound-duplicate").play();
+          }
+        },
+        (errorMessage) => {
+          console.warn("QR Error: ", errorMessage);
+        }
+      ).catch(err => {
+        alert("Không thể khởi động camera: " + err);
       });
     }
 	
