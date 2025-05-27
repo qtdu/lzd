@@ -144,10 +144,12 @@
 	  <div id="qr-reader-store">
 		<div id="qr-reader"></div>
 	  </div>
+	  <!--
 	  <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
 		  <select id="camera-select" style="width: 68vw"></select>
 		  <button onclick="startScanner()" style="width: 30vw">Bắt đầu quét</button>
 		</div>
+	-->
       <textarea id="result" placeholder="Các mã đã quét..."></textarea>
       <button id="sendData" class="sendData" onclick="sendData()">Gửi</button>
       <div id="status"></div>
@@ -170,6 +172,7 @@
     const resultArea = document.getElementById("result");
     const userSelect = document.getElementById("user-select");
     const statusDiv = document.getElementById("status");
+	
 	/*
     // Tự động phát hiện camera sau
     let cameraId = null;
@@ -198,59 +201,55 @@
 	*/
 	
 	let cameraId = null;
-    let qrScanner = null;
-    const resultArea = document.getElementById("resultArea");
-    const regex = /^[A-Z0-9\-]+$/i; // Điều kiện hợp lệ (có thể chỉnh sửa)
 
-    // Lấy danh sách camera và đổ vào select
-    Html5Qrcode.getCameras().then(devices => {
-	  const select = document.getElementById("camera-select");
-	  select.innerHTML = ""; // Xóa dòng đang tải
-
+	Html5Qrcode.getCameras().then(devices => {
 	  if (devices.length === 0) {
-		const option = document.createElement("option");
-		option.text = "Không tìm thấy camera nào";
-		option.disabled = true;
-		select.appendChild(option);
+		alert("Không tìm thấy camera nào.");
 		return;
 	  }
 
-	  devices.forEach(device => {
-		const option = document.createElement("option");
-		option.value = device.id;
-		option.text = device.label || `Camera ${select.length + 1}`;
-		select.appendChild(option);
-	  });
+	  // Ưu tiên camera có chữ 'back' trong tên, nếu không có thì lấy camera cuối
+	  let backCam = devices.find(d => d.label.toLowerCase().includes("back"));
+	  if (!backCam && devices.length > 1) {
+		backCam = devices[devices.length - 1]; // thường là camera sau
+	  } else if (!backCam) {
+		backCam = devices[0]; // fallback nếu chỉ có 1
+	  }
+
+	  cameraId = backCam.id;
+	  startScanner();
 	}).catch(err => {
-	  alert("Lỗi khi truy cập camera: " + err);
+	  console.error("Lỗi khi lấy camera:", err);
+	  alert("Không thể truy cập camera: " + err);
 	});
 
-    function runScanner() {
-      cameraId = document.getElementById("camera-select").value;
-      qrScanner = new Html5Qrcode("qr-reader");
-
-      qrScanner.start(
-        cameraId,
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
-          if (!resultArea.value.includes(decodedText)) {
-            if (regex.test(decodedText)) {
-              resultArea.value += decodedText + "\n";
-              document.getElementById("sound-success").play();
-            } else {
-              document.getElementById("sound-fail").play();
-            }
-          } else {
-            document.getElementById("sound-duplicate").play();
-          }
-        },
-        (errorMessage) => {
-          console.warn("QR Error: ", errorMessage);
-        }
-      ).catch(err => {
-        alert("Không thể khởi động camera: " + err);
-      });
-    }
+	function startScanner() {
+	  const qrScanner = new Html5Qrcode("qr-reader");
+	  qrScanner.start(
+		cameraId,
+		{ fps: 10, qrbox: { width: 250, height: 250 } },
+		(decodedText) => {
+		  if (!resultArea.value.includes(decodedText)) {
+			if (regex.test(decodedText)) {
+			  resultArea.value += decodedText + "\n";
+			  document.getElementById("sound-success").play();
+			} else {
+			  document.getElementById("sound-fail").play();
+			}
+		  } else {
+			document.getElementById("sound-duplicate").play();
+		  }
+		},
+		(errorMessage) => {
+		  console.warn("Lỗi quét:", errorMessage);
+		}
+	  ).catch(err => {
+		alert("Không thể khởi động camera: " + err);
+	  });
+	}
+	
+	
+	
 	
 	let dsSudung;
     // Lấy danh sách người quét
