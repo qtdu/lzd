@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>QR & Barcode Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-fixedcolumns/5.0.4/dataTables.fixedColumns.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+    #wrapper {
+      display: flex;
+      width: 200vw;
+      transition: transform 0.5s ease;
+    }
+    .screen {
+      width: 100vw;
+      height: 100vh;
+      box-sizing: border-box;
+      padding: 10px;
+      /*overflow: auto;*/
+	  /*overflow-y: auto;*/
+    }
+    #scanner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+
+	#video-container {
+      position: relative;
+      width: 100vw;
+      height: 35vh;
+      overflow: hidden;
+    }
+
+    #video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+	
+    #result {
+      width: 100%;
+      height: 100px;
+      margin-top: 10px;
+    }
+	
+    
+	#user-select, .sendData {
+      font-size: 18px;
+      padding: 6px;
+      width: 100%;
+      margin: 6px 0;
+    }
+	.sendData {
+		display: none;
+	}
+	
+	#DataQ {
+	position: fixed;
+	top: 5px;
+	left: 100vw;
+	width: 100vw;
+	height: 100vh;
+	/*display: none;*/
+	overflow: hidden;
+	border: solid;
+	}
+		
+	.dataTables_wrapper {
+	width: 100%;
+	overflow: auto;
+	font-size: 11px;
+				}
+
+	.dataTables_scrollHeadInner, .dataTables_scrollBody table {
+	width: 100% !important;
+	}
+		
+	#TNQ {
+	margin-bottom: 5px;
+	font-weight: blod;
+	color: red;
+	}
+
+	:root {--dt-row-selected: 13, 110, 253;--dt-row-selected-text: 255, 255, 255;--dt-row-selected-link: 9, 10, 11;--dt-row-stripe: 0, 0, 0;--dt-row-hover: 0, 0, 0;--dt-column-ordering: 0, 0, 0;--dt-html-background: white}:root.dark{--dt-html-background: rgb(33, 37, 41)}table.dataTable td.dt-control{text-align:center;cursor:pointer}table.dataTable td.dt-control:before{display:inline-block;color:rgba(0, 0, 0, 0.5);content:"►"}table.dataTable tr.dt-hasChild td.dt-control:before{content:"▼"}html.dark table.dataTable td.dt-control:before{color:rgba(255, 255, 255, 0.5)}html.dark table.dataTable tr.dt-hasChild td.dt-control:before{color:rgba(255, 255, 255, 0.5)}table.dataTable thead>tr>th.sorting,table.dataTable thead>tr>th.sorting_asc,table.dataTable thead>tr>th.sorting_desc,table.dataTable thead>tr>th.sorting_asc_disabled,table.dataTable thead>tr>th.sorting_desc_disabled,table.dataTable thead>tr>td.sorting,table.dataTable thead>tr>td.sorting_asc,table.dataTable thead>tr>td.sorting_desc,table.dataTable thead>tr>td.sorting_asc_disabled,table.dataTable thead>tr>td.sorting_desc_disabled{cursor:pointer;position:relative;padding-right:26px}table.dataTable thead>tr>th.sorting:before,table.dataTable thead>tr>th.sorting:after,table.dataTable thead>tr>th.sorting_asc:before,table.dataTable thead>tr>th.sorting_asc:after,table.dataTable thead>tr>th.sorting_desc:before,table.dataTable thead>tr>th.sorting_desc:after,table.dataTable thead>tr>th.sorting_asc_disabled:before,table.dataTable thead>tr>th.sorting_asc_disabled:after,table.dataTable thead>tr>th.sorting_desc_disabled:before,table.dataTable thead>tr>th.sorting_desc_disabled:after,table.dataTable thead>tr>td.sorting:before,table.dataTable thead>tr>td.sorting:after,table.dataTable thead>tr>td.sorting_asc:before,table.dataTable thead>tr>td.sorting_asc:after,table.dataTable thead>tr>td.sorting_desc:before,table.dataTable thead>tr>td.sorting_desc:after,table.dataTable thead>tr>td.sorting_asc_disabled:before,table.dataTable thead>tr>td.sorting_asc_disabled:after,table.dataTable thead>tr>td.sorting_desc_disabled:before,table.dataTable thead>tr>td.sorting_desc_disabled:after{position:absolute;display:block;opacity:.125;right:10px;line-height:9px;font-size:.8em}table.dataTable thead>tr>th.sorting:before,table.dataTable thead>tr>th.sorting_asc:before,table.dataTable thead>tr>th.sorting_desc:before,table.dataTable thead>tr>th.sorting_asc_disabled:before,table.dataTable thead>tr>th.sorting_desc_disabled:before,table.dataTable thead>tr>td.sorting:before,table.dataTable thead>tr>td.sorting_asc:before,table.dataTable thead>tr>td.sorting_desc:before,table.dataTable thead>tr>td.sorting_asc_disabled:before,table.dataTable thead>tr>td.sorting_desc_disabled:before{bottom:50%;content:"▲";content:"▲"/""}table.dataTable thead>tr>th.sorting:after,table.dataTable thead>tr>th.sorting_asc:after,table.dataTable thead>tr>th.sorting_desc:after,table.dataTable thead>tr>th.sorting_asc_disabled:after,table.dataTable thead>tr>th.sorting_desc_disabled:after,table.dataTable thead>tr>td.sorting:after,table.dataTable thead>tr>td.sorting_asc:after,table.dataTable thead>tr>td.sorting_desc:after,table.dataTable thead>tr>td.sorting_asc_disabled:after,table.dataTable thead>tr>td.sorting_desc_disabled:after{top:50%;content:"▼";content:"▼"/""}table.dataTable thead>tr>th.sorting_asc:before,table.dataTable thead>tr>th.sorting_desc:after,table.dataTable thead>tr>td.sorting_asc:before,table.dataTable thead>tr>td.sorting_desc:after{opacity:.6}table.dataTable thead>tr>th.sorting_desc_disabled:after,table.dataTable thead>tr>th.sorting_asc_disabled:before,table.dataTable thead>tr>td.sorting_desc_disabled:after,table.dataTable thead>tr>td.sorting_asc_disabled:before{display:none}table.dataTable thead>tr>th:active,table.dataTable thead>tr>td:active{outline:none}div.dataTables_scrollBody>table.dataTable>thead>tr>th:before,div.dataTables_scrollBody>table.dataTable>thead>tr>th:after,div.dataTables_scrollBody>table.dataTable>thead>tr>td:before,div.dataTables_scrollBody>table.dataTable>thead>tr>td:after{display:none}div.dataTables_processing{position:absolute;top:50%;left:50%;width:200px;margin-left:-100px;margin-top:-26px;text-align:center;padding:2px}div.dataTables_processing>div:last-child{position:relative;width:80px;height:15px;margin:1em auto}div.dataTables_processing>div:last-child>div{position:absolute;top:0;width:13px;height:13px;border-radius:50%;background:rgb(13, 110, 253);background:rgb(var(--dt-row-selected));animation-timing-function:cubic-bezier(0, 1, 1, 0)}div.dataTables_processing>div:last-child>div:nth-child(1){left:8px;animation:datatables-loader-1 .6s infinite}div.dataTables_processing>div:last-child>div:nth-child(2){left:8px;animation:datatables-loader-2 .6s infinite}div.dataTables_processing>div:last-child>div:nth-child(3){left:32px;animation:datatables-loader-2 .6s infinite}div.dataTables_processing>div:last-child>div:nth-child(4){left:56px;animation:datatables-loader-3 .6s infinite}@keyframes datatables-loader-1{0%{transform:scale(0)}100%{transform:scale(1)}}@keyframes datatables-loader-3{0%{transform:scale(1)}100%{transform:scale(0)}}@keyframes datatables-loader-2{0%{transform:translate(0, 0)}100%{transform:translate(24px, 0)}}table.dataTable.nowrap th,table.dataTable.nowrap td{white-space:nowrap}table.dataTable th.dt-left,table.dataTable td.dt-left{text-align:left}table.dataTable th.dt-center,table.dataTable td.dt-center,table.dataTable td.dataTables_empty{text-align:center}table.dataTable th.dt-right,table.dataTable td.dt-right{text-align:right}table.dataTable th.dt-justify,table.dataTable td.dt-justify{text-align:justify}table.dataTable th.dt-nowrap,table.dataTable td.dt-nowrap{white-space:nowrap}table.dataTable thead th,table.dataTable thead td,table.dataTable tfoot th,table.dataTable tfoot td{text-align:left}table.dataTable thead th.dt-head-left,table.dataTable thead td.dt-head-left,table.dataTable tfoot th.dt-head-left,table.dataTable tfoot td.dt-head-left{text-align:left}table.dataTable thead th.dt-head-center,table.dataTable thead td.dt-head-center,table.dataTable tfoot th.dt-head-center,table.dataTable tfoot td.dt-head-center{text-align:center}table.dataTable thead th.dt-head-right,table.dataTable thead td.dt-head-right,table.dataTable tfoot th.dt-head-right,table.dataTable tfoot td.dt-head-right{text-align:right}table.dataTable thead th.dt-head-justify,table.dataTable thead td.dt-head-justify,table.dataTable tfoot th.dt-head-justify,table.dataTable tfoot td.dt-head-justify{text-align:justify}table.dataTable thead th.dt-head-nowrap,table.dataTable thead td.dt-head-nowrap,table.dataTable tfoot th.dt-head-nowrap,table.dataTable tfoot td.dt-head-nowrap{white-space:nowrap}table.dataTable tbody th.dt-body-left,table.dataTable tbody td.dt-body-left{text-align:left}table.dataTable tbody th.dt-body-center,table.dataTable tbody td.dt-body-center{text-align:center}table.dataTable tbody th.dt-body-right,table.dataTable tbody td.dt-body-right{text-align:right}table.dataTable tbody th.dt-body-justify,table.dataTable tbody td.dt-body-justify{text-align:justify}table.dataTable tbody th.dt-body-nowrap,table.dataTable tbody td.dt-body-nowrap{white-space:nowrap}table.dataTable{width:100%;margin:0 auto;clear:both;border-collapse:separate;border-spacing:0}table.dataTable thead th,table.dataTable tfoot th{font-weight:bold}table.dataTable>thead>tr>th,table.dataTable>thead>tr>td{padding:10px;border-bottom:1px solid rgba(0, 0, 0, 0.3)}table.dataTable>thead>tr>th:active,table.dataTable>thead>tr>td:active{outline:none}table.dataTable>tfoot>tr>th,table.dataTable>tfoot>tr>td{padding:10px 10px 6px 10px;border-top:1px solid rgba(0, 0, 0, 0.3)}table.dataTable tbody tr{background-color:transparent}table.dataTable tbody tr.selected>*{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.9);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.9);color:rgb(255, 255, 255);color:rgb(var(--dt-row-selected-text))}table.dataTable tbody tr.selected a{color:rgb(9, 10, 11);color:rgb(var(--dt-row-selected-link))}table.dataTable tbody th,table.dataTable tbody td{padding:8px 10px}table.dataTable.row-border>tbody>tr>th,table.dataTable.row-border>tbody>tr>td,table.dataTable.display>tbody>tr>th,table.dataTable.display>tbody>tr>td{border-top:1px solid rgba(0, 0, 0, 0.15)}table.dataTable.row-border>tbody>tr:first-child>th,table.dataTable.row-border>tbody>tr:first-child>td,table.dataTable.display>tbody>tr:first-child>th,table.dataTable.display>tbody>tr:first-child>td{border-top:none}table.dataTable.row-border>tbody>tr.selected+tr.selected>td,table.dataTable.display>tbody>tr.selected+tr.selected>td{border-top-color:#0262ef}table.dataTable.cell-border>tbody>tr>th,table.dataTable.cell-border>tbody>tr>td{border-top:1px solid rgba(0, 0, 0, 0.15);border-right:1px solid rgba(0, 0, 0, 0.15)}table.dataTable.cell-border>tbody>tr>th:first-child,table.dataTable.cell-border>tbody>tr>td:first-child{border-left:1px solid rgba(0, 0, 0, 0.15)}table.dataTable.cell-border>tbody>tr:first-child>th,table.dataTable.cell-border>tbody>tr:first-child>td{border-top:none}table.dataTable.stripe>tbody>tr.odd>*,table.dataTable.display>tbody>tr.odd>*{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.023);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-stripe), 0.023)}table.dataTable.stripe>tbody>tr.odd.selected>*,table.dataTable.display>tbody>tr.odd.selected>*{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.923);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.923)}table.dataTable.hover>tbody>tr:hover>*,table.dataTable.display>tbody>tr:hover>*{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.035);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-hover), 0.035)}table.dataTable.hover>tbody>tr.selected:hover>*,table.dataTable.display>tbody>tr.selected:hover>*{box-shadow:inset 0 0 0 9999px #0d6efd !important;box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 1) !important}table.dataTable.order-column>tbody tr>.sorting_1,table.dataTable.order-column>tbody tr>.sorting_2,table.dataTable.order-column>tbody tr>.sorting_3,table.dataTable.display>tbody tr>.sorting_1,table.dataTable.display>tbody tr>.sorting_2,table.dataTable.display>tbody tr>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.019);box-shadow:inset 0 0 0 9999px rgba(var(--dt-column-ordering), 0.019)}table.dataTable.order-column>tbody tr.selected>.sorting_1,table.dataTable.order-column>tbody tr.selected>.sorting_2,table.dataTable.order-column>tbody tr.selected>.sorting_3,table.dataTable.display>tbody tr.selected>.sorting_1,table.dataTable.display>tbody tr.selected>.sorting_2,table.dataTable.display>tbody tr.selected>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.919);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.919)}table.dataTable.display>tbody>tr.odd>.sorting_1,table.dataTable.order-column.stripe>tbody>tr.odd>.sorting_1{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.054);box-shadow:inset 0 0 0 9999px rgba(var(--dt-column-ordering), 0.054)}table.dataTable.display>tbody>tr.odd>.sorting_2,table.dataTable.order-column.stripe>tbody>tr.odd>.sorting_2{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.047);box-shadow:inset 0 0 0 9999px rgba(var(--dt-column-ordering), 0.047)}table.dataTable.display>tbody>tr.odd>.sorting_3,table.dataTable.order-column.stripe>tbody>tr.odd>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.039);box-shadow:inset 0 0 0 9999px rgba(var(--dt-column-ordering), 0.039)}table.dataTable.display>tbody>tr.odd.selected>.sorting_1,table.dataTable.order-column.stripe>tbody>tr.odd.selected>.sorting_1{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.954);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.954)}table.dataTable.display>tbody>tr.odd.selected>.sorting_2,table.dataTable.order-column.stripe>tbody>tr.odd.selected>.sorting_2{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.947);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.947)}table.dataTable.display>tbody>tr.odd.selected>.sorting_3,table.dataTable.order-column.stripe>tbody>tr.odd.selected>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.939);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.939)}table.dataTable.display>tbody>tr.even>.sorting_1,table.dataTable.order-column.stripe>tbody>tr.even>.sorting_1{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.019);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.019)}table.dataTable.display>tbody>tr.even>.sorting_2,table.dataTable.order-column.stripe>tbody>tr.even>.sorting_2{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.011);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.011)}table.dataTable.display>tbody>tr.even>.sorting_3,table.dataTable.order-column.stripe>tbody>tr.even>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.003);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.003)}table.dataTable.display>tbody>tr.even.selected>.sorting_1,table.dataTable.order-column.stripe>tbody>tr.even.selected>.sorting_1{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.919);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.919)}table.dataTable.display>tbody>tr.even.selected>.sorting_2,table.dataTable.order-column.stripe>tbody>tr.even.selected>.sorting_2{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.911);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.911)}table.dataTable.display>tbody>tr.even.selected>.sorting_3,table.dataTable.order-column.stripe>tbody>tr.even.selected>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.903);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.903)}table.dataTable.display tbody tr:hover>.sorting_1,table.dataTable.order-column.hover tbody tr:hover>.sorting_1{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.082);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-hover), 0.082)}table.dataTable.display tbody tr:hover>.sorting_2,table.dataTable.order-column.hover tbody tr:hover>.sorting_2{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.074);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-hover), 0.074)}table.dataTable.display tbody tr:hover>.sorting_3,table.dataTable.order-column.hover tbody tr:hover>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(0, 0, 0, 0.062);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-hover), 0.062)}table.dataTable.display tbody tr:hover.selected>.sorting_1,table.dataTable.order-column.hover tbody tr:hover.selected>.sorting_1{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.982);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.982)}table.dataTable.display tbody tr:hover.selected>.sorting_2,table.dataTable.order-column.hover tbody tr:hover.selected>.sorting_2{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.974);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.974)}table.dataTable.display tbody tr:hover.selected>.sorting_3,table.dataTable.order-column.hover tbody tr:hover.selected>.sorting_3{box-shadow:inset 0 0 0 9999px rgba(13, 110, 253, 0.962);box-shadow:inset 0 0 0 9999px rgba(var(--dt-row-selected), 0.962)}table.dataTable.no-footer{border-bottom:1px solid rgba(0, 0, 0, 0.3)}table.dataTable.compact thead th,table.dataTable.compact thead td,table.dataTable.compact tfoot th,table.dataTable.compact tfoot td,table.dataTable.compact tbody th,table.dataTable.compact tbody td{padding:4px}table.dataTable th,table.dataTable td{box-sizing:content-box}.dataTables_wrapper{position:relative;clear:both}.dataTables_wrapper .dataTables_length{float:left}.dataTables_wrapper .dataTables_length select{border:1px solid #aaa;border-radius:3px;padding:5px;background-color:transparent;color:inherit;padding:4px}.dataTables_wrapper .dataTables_filter{float:right;text-align:right}.dataTables_wrapper .dataTables_filter input{border:1px solid #aaa;border-radius:3px;padding:5px;background-color:transparent;color:inherit;margin-left:3px}.dataTables_wrapper .dataTables_info{clear:both;float:left;padding-top:.755em}.dataTables_wrapper .dataTables_paginate{float:right;text-align:right;padding-top:.25em}.dataTables_wrapper .dataTables_paginate .paginate_button{box-sizing:border-box;display:inline-block;min-width:1.5em;padding:.5em 1em;margin-left:2px;text-align:center;text-decoration:none !important;cursor:pointer;color:inherit !important;border:1px solid transparent;border-radius:2px;background:transparent}.dataTables_wrapper .dataTables_paginate .paginate_button.current,.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{color:inherit !important;border:1px solid rgba(0, 0, 0, 0.3);background-color:rgba(0, 0, 0, 0.05);background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, rgba(230, 230, 230, 0.05)), color-stop(100%, rgba(0, 0, 0, 0.05)));background:-webkit-linear-gradient(top, rgba(230, 230, 230, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%);background:-moz-linear-gradient(top, rgba(230, 230, 230, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%);background:-ms-linear-gradient(top, rgba(230, 230, 230, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%);background:-o-linear-gradient(top, rgba(230, 230, 230, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%);background:linear-gradient(to bottom, rgba(230, 230, 230, 0.05) 0%, rgba(0, 0, 0, 0.05) 100%)}.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active{cursor:default;color:#666 !important;border:1px solid transparent;background:transparent;box-shadow:none}.dataTables_wrapper .dataTables_paginate .paginate_button:hover{color:white !important;border:1px solid #111;background-color:#111;background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #585858), color-stop(100%, #111));background:-webkit-linear-gradient(top, #585858 0%, #111 100%);background:-moz-linear-gradient(top, #585858 0%, #111 100%);background:-ms-linear-gradient(top, #585858 0%, #111 100%);background:-o-linear-gradient(top, #585858 0%, #111 100%);background:linear-gradient(to bottom, #585858 0%, #111 100%)}.dataTables_wrapper .dataTables_paginate .paginate_button:active{outline:none;background-color:#0c0c0c;background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #2b2b2b), color-stop(100%, #0c0c0c));background:-webkit-linear-gradient(top, #2b2b2b 0%, #0c0c0c 100%);background:-moz-linear-gradient(top, #2b2b2b 0%, #0c0c0c 100%);background:-ms-linear-gradient(top, #2b2b2b 0%, #0c0c0c 100%);background:-o-linear-gradient(top, #2b2b2b 0%, #0c0c0c 100%);background:linear-gradient(to bottom, #2b2b2b 0%, #0c0c0c 100%);box-shadow:inset 0 0 3px #111}.dataTables_wrapper .dataTables_paginate .ellipsis{padding:0 1em}.dataTables_wrapper .dataTables_length,.dataTables_wrapper .dataTables_filter,.dataTables_wrapper .dataTables_info,.dataTables_wrapper .dataTables_processing,.dataTables_wrapper .dataTables_paginate{color:inherit}.dataTables_wrapper .dataTables_scroll{clear:both}.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody{-webkit-overflow-scrolling:touch}.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>thead>tr>th,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>thead>tr>td,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>tbody>tr>th,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>tbody>tr>td{vertical-align:middle}.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>thead>tr>th>div.dataTables_sizing,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>thead>tr>td>div.dataTables_sizing,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>tbody>tr>th>div.dataTables_sizing,.dataTables_wrapper .dataTables_scroll div.dataTables_scrollBody>table>tbody>tr>td>div.dataTables_sizing{height:0;overflow:hidden;margin:0 !important;padding:0 !important}.dataTables_wrapper.no-footer .dataTables_scrollBody{border-bottom:1px solid rgba(0, 0, 0, 0.3)}.dataTables_wrapper.no-footer div.dataTables_scrollHead table.dataTable,.dataTables_wrapper.no-footer div.dataTables_scrollBody>table{border-bottom:none}.dataTables_wrapper:after{visibility:hidden;display:block;content:"";clear:both;height:0}@media screen and (max-width: 767px){.dataTables_wrapper .dataTables_info,.dataTables_wrapper .dataTables_paginate{float:none;text-align:center}.dataTables_wrapper .dataTables_paginate{margin-top:.5em}}@media screen and (max-width: 640px){.dataTables_wrapper .dataTables_length,.dataTables_wrapper .dataTables_filter{float:none;text-align:center}.dataTables_wrapper .dataTables_filter{margin-top:.5em}}html.dark{--dt-row-hover: 255, 255, 255;--dt-row-stripe: 255, 255, 255;--dt-column-ordering: 255, 255, 255}html.dark table.dataTable>thead>tr>th,html.dark table.dataTable>thead>tr>td{border-bottom:1px solid rgb(89, 91, 94)}html.dark table.dataTable>thead>tr>th:active,html.dark table.dataTable>thead>tr>td:active{outline:none}html.dark table.dataTable>tfoot>tr>th,html.dark table.dataTable>tfoot>tr>td{border-top:1px solid rgb(89, 91, 94)}html.dark table.dataTable.row-border>tbody>tr>th,html.dark table.dataTable.row-border>tbody>tr>td,html.dark table.dataTable.display>tbody>tr>th,html.dark table.dataTable.display>tbody>tr>td{border-top:1px solid rgb(64, 67, 70)}html.dark table.dataTable.row-border>tbody>tr.selected+tr.selected>td,html.dark table.dataTable.display>tbody>tr.selected+tr.selected>td{border-top-color:#0257d5}html.dark table.dataTable.cell-border>tbody>tr>th,html.dark table.dataTable.cell-border>tbody>tr>td{border-top:1px solid rgb(64, 67, 70);border-right:1px solid rgb(64, 67, 70)}html.dark table.dataTable.cell-border>tbody>tr>th:first-child,html.dark table.dataTable.cell-border>tbody>tr>td:first-child{border-left:1px solid rgb(64, 67, 70)}html.dark .dataTables_wrapper .dataTables_filter input,html.dark .dataTables_wrapper .dataTables_length select{border:1px solid rgba(255, 255, 255, 0.2);background-color:var(--dt-html-background)}html.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current,html.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{border:1px solid rgb(89, 91, 94);background:rgba(255, 255, 255, 0.15)}html.dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,html.dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,html.dark .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active{color:#666 !important}html.dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover{border:1px solid rgb(53, 53, 53);background:rgb(53, 53, 53)}html.dark .dataTables_wrapper .dataTables_paginate .paginate_button:active{background:#3a3a3a
+
+	}
+		
+		
+	table.dataTable thead tr>.dtfc-fixed-left,table.dataTable thead tr>.dtfc-fixed-right,table.dataTable tfoot tr>.dtfc-fixed-left,table.dataTable tfoot tr>.dtfc-fixed-right{top:0;bottom:0;z-index:3;background-color:white}table.dataTable tbody tr>.dtfc-fixed-left,table.dataTable tbody tr>.dtfc-fixed-right{z-index:1;background-color:white}div.dtfc-left-top-blocker,div.dtfc-right-top-blocker{background-color:white}html.dark table.dataTable thead tr>.dtfc-fixed-left,html.dark table.dataTable thead tr>.dtfc-fixed-right,html.dark table.dataTable tfoot tr>.dtfc-fixed-left,html.dark table.dataTable tfoot tr>.dtfc-fixed-right{background-color:var(--dt-html-background)}html.dark table.dataTable tbody tr>.dtfc-fixed-left,html.dark table.dataTable tbody tr>.dtfc-fixed-right{background-color:var(--dt-html-background)}html.dark div.dtfc-left-top-blocker,html.dark div.dtfc-right-top-blocker{background-color:var(--dt-html-background)}
+	  
+	@media screen and (max-width: 600px) {
+	  .dataTables_filter input {
+		width: 80px !important;
+	  }
+	}
+  
+  </style>
+</head>
+<body>
+	<audio id="sound-success" preload="auto">
+	  <source src="1.mp3" type="audio/mp3">
+	</audio>
+	<audio id="sound-fail" preload="auto">
+	  <source src="2.mp3" type="audio/mp3">
+	</audio>
+	<audio id="sound-duplicate" preload="auto">
+	  <source src="3.mp3" type="audio/mp3">
+	</audio>
+	<audio id="sound-success" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_b19cba9506.mp3" preload="auto"></audio>
+	<audio id="sound-duplicate" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_736dbf50c8.mp3" preload="auto"></audio>
+	
+  <div id="wrapper">
+    <div class="screen" id="scanner">
+      <select id="user-select"></select>
+	  <div id="password-group" style="margin-top: 5px; margin-bottom: 10px; display: flex; gap: 5px;  align-items: center;">
+		  <input type="password" id="passwordInput" placeholder="Nhập mật khẩu" style="flex: 1; padding: 5px; width: 60vw" />
+		  <button id="confirmButton" style="padding: 6px 12px; width: calc(40vw - 24px - 10px); ">Xác nhận</button>
+	  </div>
+	  
+	  <div id="video-container">
+		<video id="video" autoplay muted playsinline></video>
+		<!--<div id="focus-box"></div>-->
+	  </div>
+	  <!--
+	  <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+		  <select id="camera-select" style="width: 68vw"></select>
+		  <button onclick="startScanner()" style="width: 30vw">Bắt đầu quét</button>
+		</div>
+	-->
+      <textarea id="result" placeholder="Các mã đã quét..."></textarea>
+      <button id="sendData" class="sendData" onclick="sendData()">Gửi</button>
+      <div id="status"></div>
+    </div>
+	
+	<div id="DataQ">
+		<div id="TNQ" onclick="returnMain()">kết quả scan</div>
+		<table id="myTableQ" class="display">
+			<thead>
+				<tr><th>Người</th><th>Mã</th><th>Thời gian</th><th>Thiết bị</th><th>Số lượng</th></tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+  </div>
+  <script>
+    const appScriptUrl = "https://script.google.com/macros/s/AKfycbwjcv9i0zu2wjP-6xocYxMk4m8cIiUVgTuVBRgOSLd5ss-QZn0FPfC6ZPJMPfX6EiY/exec"; // Thay bằng URL Web App
+	const regex = /^\d{4}-\d{4}$/;
+	
+    const resultArea = document.getElementById("result");
+    const userSelect = document.getElementById("user-select");
+    const statusDiv = document.getElementById("status");
+	
+	
+	/*
+	let cameraId = null;
+
+	Html5Qrcode.getCameras().then(devices => {
+	  if (devices.length === 0) {
+		alert("Không tìm thấy camera nào.");
+		return;
+	  }
+
+	  // Ưu tiên camera có chữ 'back' trong tên, nếu không có thì lấy camera cuối
+	  let backCam = devices.find(d => d.label.toLowerCase().includes("back"));
+	  if (!backCam && devices.length > 1) {
+		backCam = devices[devices.length - 1]; // thường là camera sau
+	  } else if (!backCam) {
+		backCam = devices[0]; // fallback nếu chỉ có 1
+	  }
+
+	  cameraId = backCam.id;
+	  startScanner();
+	}).catch(err => {
+	  console.error("Lỗi khi lấy camera:", err);
+	  alert("Không thể truy cập camera: " + err);
+	});
+
+	function startScanner() {
+	  const qrScanner = new Html5Qrcode("qr-reader");
+	  qrScanner.start(
+		cameraId,
+		//{ fps: 10, qrbox: { width: 250, height: 250 } },
+		{ fps: 5, qrbox: { width: 300, height: 300 } },
+		(decodedText) => {
+		  if (!resultArea.value.includes(decodedText)) {
+			if (regex.test(decodedText)) {
+			  resultArea.value += decodedText + "\n";
+			  document.getElementById("sound-success").play();
+			} else {
+			  document.getElementById("sound-fail").play();
+			}
+		  } else {
+			document.getElementById("sound-duplicate").play();
+		  }
+		},
+		(errorMessage) => {
+		  console.warn("Lỗi quét:", errorMessage);
+		}
+	  ).catch(err => {
+		alert("Không thể khởi động camera: " + err);
+	  });
+	}
+	*/
+	
+	
+
+  <!-- QR Scanner -->
+  <script src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
+  <script>
+    QrScanner.WORKER_PATH = 'https://unpkg.com/qr-scanner@1.4.2/qr-scanner-worker.min.js';
+
+    const videoElem = document.getElementById('video');
+    const resultArea = document.getElementById('resultArea');
+    const scannedSet = new Set();
+
+    const soundSuccess = document.getElementById('sound-success');
+    const soundDuplicate = document.getElementById('sound-duplicate');
+
+    const scanner = new QrScanner(videoElem, result => {
+      const text = typeof result === 'string' ? result : result.data || String(result);
+      if (!scannedSet.has(text)) {
+        scannedSet.add(text);
+        resultArea.value += text + "\n";
+        soundSuccess.play();
+      } else {
+        soundDuplicate.play();
+      }
+    }, {
+      highlightScanRegion: true,
+      maxScansPerSecond: 5
+    });
+
+    scanner.start();
+	
+	
+	
+	let dsSudung;
+    // Lấy danh sách người quét
+    fetch(appScriptUrl)
+      .then(res => res.json())
+      .then(data => {
+		dsSudung = data
+        data.forEach(name => {
+			
+          const opt = document.createElement("option");
+          opt.value = name[0];
+          opt.textContent = name[0];
+          userSelect.appendChild(opt);
+        });
+      });
+
+    function sendData() {
+      const codes = resultArea.value.trim();
+      const user = userSelect.value;
+      if (!codes || !user) return alert("Chọn người và có mã để gửi.");
+      fetch(appScriptUrl, {
+        method: "POST",
+        body: JSON.stringify({ user, codes })
+      }).then(res => res.text())
+        .then(msg => {
+          statusDiv.textContent = msg;
+          resultArea.value = "";
+		  updateTable();
+        }).catch(err => statusDiv.textContent = "Lỗi gửi!");
+    }
+
+	h_window = window.innerHeight;
+	h_table = (h_window - 165) + "px"
+	let tableQ;
+	function CreateTable(defaultDataT) {
+		tableQ = $('#myTableQ').DataTable({
+			"paging": true,
+			"searching": true,
+			"scrollX": true,
+			"scrollY": h_table, //"500px"
+			"scrollCollapse": false,
+			"order": [[0, "asc"]],
+			"autoWidth": false, // Ngăn cột bị cố định sai kích thước
+		  pageLength: 200,
+		  lengthMenu: [5, 10, 20, 100, 200],
+		  responsive: true,
+		  
+		  language: {
+			lengthMenu: "Hiển thị _MENU_ dòng",
+			search: "Tìm:",
+			//info: "Đang hiển thị _START_ đến _END_ trong tổng số _TOTAL_ dòng",
+			info: "[_START_-_END_/_TOTAL_]",
+			paginate: {
+			  first: "<<",
+			  last: ">>",
+			  next: ">",
+			  previous: "<"
+			},
+			infoEmpty: "Không có dữ liệu",
+			zeroRecords: "Không tìm thấy kết quả",
+			//"fixedColumns": {
+			//	"left": 1,
+			//	"right": 1
+			//},
+			"data": defaultDataT
+		  },
+		  
+		  initComplete: function() {
+				setTimeout(() => {
+				  const wrapper = $('.dataTables_wrapper');
+
+				  // 👉 Dòng trên: length + filter
+				  const topRow = $('<div class="dtable-top-row"></div>').css({
+					display: 'flex',
+					justifyContent: 'space-between',
+					alignItems: 'center',
+					marginBottom: '10px',
+					paddingLeft: '8px',
+					paddingRight: '8px',
+					flexWrap: 'wrap'
+				  });
+
+				  // Căn trái + phải
+				  wrapper.find('.dataTables_length').css({
+					marginRight: 'auto'
+				  });
+
+				  wrapper.find('.dataTables_filter').css({
+					marginLeft: 'auto'
+				  });
+
+				  // Giảm size ô tìm kiếm
+				  wrapper.find('.dataTables_filter input').css({
+					width: '120px',
+					marginLeft: '6px',
+					padding: '4px'
+				  });
+
+				  topRow.append(wrapper.find('.dataTables_length'));
+				  topRow.append(wrapper.find('.dataTables_filter'));
+
+				  wrapper.prepend(topRow);
+
+				  // 👉 Dòng dưới: info + paginate
+				  const bottomRow = $('<div class="dtable-bottom-row"></div>').css({
+					display: 'flex',
+					justifyContent: 'space-between',
+					alignItems: 'center',
+					marginTop: '10px',
+					paddingLeft: '8px',
+					paddingRight: '8px',
+					flexWrap: 'wrap'
+				  });
+
+				  wrapper.find('.dataTables_info').css({
+					marginRight: 'auto'
+				  });
+
+				  wrapper.find('.dataTables_paginate').css({
+					marginLeft: 'auto'
+				  });
+
+				  bottomRow.append(wrapper.find('.dataTables_info'));
+				  bottomRow.append(wrapper.find('.dataTables_paginate'));
+
+				  wrapper.append(bottomRow);
+				}, 0);
+			  }
+		});
+
+		// Cập nhật header khi cửa sổ thay đổi kích thước
+		$(window).on('resize', function () {
+			setTimeout(function () {
+				tableQ.columns.adjust();
+			}, 200); // Đợi một chút để cập nhật kích thước
+		});
+		
+		$('#myTableQ').on('click', 'td:nth-child(10)', function () {
+			var cellData = tableQ.cell(this).data(); // Lấy dữ liệu ô được click
+			if(cellData.indexOf("https://logistics-lastmile.oss-ap-southeast-1.aliyuncs.com/")>-1 || cellData.indexOf("http://logistics-firstmile.oss-ap-southeast-1.aliyuncs.com")>-1) {
+				cellDataArr = cellData.split("+++")
+				for(i=1; i<cellDataArr.length; i++) {
+					window.open(cellDataArr[i])
+				}
+				//window.open("https://qtdu.com/page?LINK=" + gt);
+			}
+		});
+
+	}
+	CreateTable([])
+		
+
+	function updateTable() {
+	  fetch(appScriptUrl + "?table=1&t=" + Date.now())
+		.then(res => res.json())
+		.then(datarows => {
+		  //renderTable(rows);
+		  //alert(datarows)
+		  var currentPage = tableQ.page(); // lưu lại trang hiện tại
+
+			tableQ.clear().rows.add(datarows).draw(false); // false => không reset trang
+			tableQ.page(currentPage).draw(false); // trở lại trang cũ nếu cần chắc chắn
+		  //tableQ.clear().rows.add(datarows).draw();
+		  
+		  
+		})
+		.catch(error => {
+		  console.error("Lỗi khi lấy dữ liệu:", error);
+		});
+	}
+	//updateTable();
+	
+
+    // Vuốt chuyển màn hình
+    let startX = 0;
+    document.body.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+    document.body.addEventListener("touchend", e => {
+      let diff = e.changedTouches[0].clientX - startX;
+      if (diff < -50) document.getElementById("wrapper").style.transform = "translateX(-100vw)";
+      else if (diff > 50) document.getElementById("wrapper").style.transform = "translateX(0vw)";
+    });
+	
+	function returnMain() {
+		document.getElementById("wrapper").style.transform = "translateX(0vw)";
+	}
+	
+	//alert(window.innerHeight);
+
+	// Lấy dữ liệu lần đầu
+	updateTable();
+
+	// Cập nhật mỗi 10s
+	setInterval(updateTable, 5000);
+    
+	document.getElementById('user-select').addEventListener('change', function () {
+		document.getElementById('passwordInput').value = "";
+		document.getElementById('sendData').style.display = "none";
+	});
+	document.getElementById('confirmButton').addEventListener('click', function () {
+		pass = document.getElementById('passwordInput').value;
+		usr = document.getElementById('user-select').value;
+		timthay = false
+		for(i=0;i<dsSudung.length;i++){
+			if(dsSudung[i][0] == usr && dsSudung[i][1] == pass) {
+				document.getElementById('sendData').style.display = "inline-block";
+				timthay = true
+				break;
+			}
+		}
+		if(timthay == false) {
+			alert("Không đúng mật khẩu, bạn phải nhập lại")
+			document.getElementById('passwordInput').value = "";
+			document.getElementById('passwordInput').focus();
+		}
+		//document.getElementById('sendData').style.display = "inline-block";
+	});
+	
+
+    // Từ chối nếu không dùng trên điện thoại
+    if (!/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+      document.body.innerHTML = "<h2>Chỉ dùng được trên điện thoại.</h2>";
+    }
+	/*
+	const TEST_URLS = [
+      "https://www.llportal.vn/favicon.ico",     // favicon thường cho phép tải
+      "http://30.126.84.39:8071/favicon.ico"      // thay bằng ảnh nếu có
+    ];
+
+    function checkImageLoad(url) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);     // truy cập được
+        img.onerror = () => resolve(false);   // không truy cập được
+        img.src = url + "?rand=" + Math.random();  // tránh cache
+      });
+    }
+
+    async function main() {
+      const results = await Promise.all(TEST_URLS.map(checkImageLoad));
+      const accessible = results.some(r => r === true); // nếu truy cập được ít nhất 1
+
+      const statusEl = document.getElementById("status");
+
+      if (accessible) {
+        //statusEl.textContent = "⛔️ Đang dùng mạng công ty/VPN – KHÔNG cho phép tiếp tục.";
+        //statusEl.style.color = "red";
+		document.body.innerHTML = "<h2>⛔️ Đang dùng mạng công ty/VPN – KHÔNG cho phép tiếp tục.</h2>";
+      } else {
+        //statusEl.textContent = "✅ Không truy cập được mạng công ty – Cho phép tiếp tục.";
+        //statusEl.style.color = "green";
+
+        // 👉 Gọi xử lý tiếp theo ở đây nếu cần
+        // runMainApp();
+      }
+    }
+	
+	setInterval(main, 10000);
+	*/
+	
+	function checkURL() {
+	
+		const img = new Image();
+		const url = "https://file.alibaba-inc.com/media/img/alifile.png"; // Thay URL cần kiểm tra
+
+		img.onload = function () {
+		  document.body.innerHTML = "<h2>⛔️ Đang dùng mạng công ty/VPN – KHÔNG cho phép tiếp tục.</h2>";
+		};
+
+		img.onerror = function () {
+		  
+		};
+
+		img.src = url + "?cache_bust=" + Date.now(); // Thêm chuỗi ngẫu nhiên để tránh cache
+	}
+	
+	setInterval(checkURL, 10000);
+	
+  </script>
+</body>
+</html>
