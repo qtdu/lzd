@@ -4,10 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>QR & Barcode Scanner</title>
-  <script src="https://unpkg.com/html5-qrcode"></script>
+  <!--<script src="https://unpkg.com/html5-qrcode"></script>-->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script
   <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables.net-fixedcolumns/5.0.4/dataTables.fixedColumns.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
+  <script src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
 
   <style>
     body {
@@ -216,8 +217,8 @@
 	
 
   <!-- QR Scanner -->
-  <script src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
-  <script>
+  
+  
     QrScanner.WORKER_PATH = 'https://unpkg.com/qr-scanner@1.4.2/qr-scanner-worker.min.js';
 
     const videoElem = document.getElementById('video');
