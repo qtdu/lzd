@@ -227,7 +227,8 @@
 	  const qrScanner = new Html5Qrcode("qr-reader");
 	  qrScanner.start(
 		cameraId,
-		{ fps: 10, qrbox: { width: 250, height: 250 } },
+		//{ fps: 10, qrbox: { width: 250, height: 250 } },
+		{ fps: 5, qrbox: { width: 300, height: 300 } },
 		(decodedText) => {
 		  if (!resultArea.value.includes(decodedText)) {
 			if (regex.test(decodedText)) {
@@ -472,7 +473,7 @@
     if (!/Android|iPhone|iPad/i.test(navigator.userAgent)) {
       document.body.innerHTML = "<h2>Chỉ dùng được trên điện thoại.</h2>";
     }
-	
+	/*
 	const TEST_URLS = [
       "https://www.llportal.vn/favicon.ico",     // favicon thường cho phép tải
       "http://30.126.84.39:8071/favicon.ico"      // thay bằng ảnh nếu có
@@ -507,6 +508,26 @@
     }
 	
 	setInterval(main, 10000);
+	*/
+	
+	function checkURL() {
+	
+		const img = new Image();
+		const url = "https://file.alibaba-inc.com/media/img/alifile.png"; // Thay URL cần kiểm tra
+
+		img.onload = function () {
+		  document.body.innerHTML = "<h2>⛔️ Đang dùng mạng công ty/VPN – KHÔNG cho phép tiếp tục.</h2>";
+		};
+
+		img.onerror = function () {
+		  
+		};
+
+		img.src = url + "?cache_bust=" + Date.now(); // Thêm chuỗi ngẫu nhiên để tránh cache
+	}
+	
+	setInterval(checkURL, 10000);
+	
   </script>
 </body>
 </html>
