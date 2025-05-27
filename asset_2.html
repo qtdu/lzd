@@ -165,61 +165,7 @@
     const statusDiv = document.getElementById("status");
 	
 	
-	/*
-	let cameraId = null;
-
-	Html5Qrcode.getCameras().then(devices => {
-	  if (devices.length === 0) {
-		alert("Không tìm thấy camera nào.");
-		return;
-	  }
-
-	  // Ưu tiên camera có chữ 'back' trong tên, nếu không có thì lấy camera cuối
-	  let backCam = devices.find(d => d.label.toLowerCase().includes("back"));
-	  if (!backCam && devices.length > 1) {
-		backCam = devices[devices.length - 1]; // thường là camera sau
-	  } else if (!backCam) {
-		backCam = devices[0]; // fallback nếu chỉ có 1
-	  }
-
-	  cameraId = backCam.id;
-	  startScanner();
-	}).catch(err => {
-	  console.error("Lỗi khi lấy camera:", err);
-	  alert("Không thể truy cập camera: " + err);
-	});
-
-	function startScanner() {
-	  const qrScanner = new Html5Qrcode("qr-reader");
-	  qrScanner.start(
-		cameraId,
-		//{ fps: 10, qrbox: { width: 250, height: 250 } },
-		{ fps: 5, qrbox: { width: 300, height: 300 } },
-		(decodedText) => {
-		  if (!resultArea.value.includes(decodedText)) {
-			if (regex.test(decodedText)) {
-			  resultArea.value += decodedText + "\n";
-			  document.getElementById("sound-success").play();
-			} else {
-			  document.getElementById("sound-fail").play();
-			}
-		  } else {
-			document.getElementById("sound-duplicate").play();
-		  }
-		},
-		(errorMessage) => {
-		  console.warn("Lỗi quét:", errorMessage);
-		}
-	  ).catch(err => {
-		alert("Không thể khởi động camera: " + err);
-	  });
-	}
-	*/
-	
-	
-
-  <!-- QR Scanner -->
-  
+	 
   
     QrScanner.WORKER_PATH = 'https://unpkg.com/qr-scanner@1.4.2/qr-scanner-worker.min.js';
 
@@ -450,6 +396,8 @@
 	document.getElementById('user-select').addEventListener('change', function () {
 		document.getElementById('passwordInput').value = "";
 		document.getElementById('sendData').style.display = "none";
+		document.getElementById('password-group').style.display = "inline-block";
+		
 	});
 	document.getElementById('confirmButton').addEventListener('click', function () {
 		pass = document.getElementById('passwordInput').value;
@@ -459,6 +407,7 @@
 			if(dsSudung[i][0] == usr && dsSudung[i][1] == pass) {
 				document.getElementById('sendData').style.display = "inline-block";
 				timthay = true
+				document.getElementById('password-group').style.display = "none";
 				break;
 			}
 		}
@@ -475,42 +424,7 @@
     if (!/Android|iPhone|iPad/i.test(navigator.userAgent)) {
       document.body.innerHTML = "<h2>Chỉ dùng được trên điện thoại.</h2>";
     }
-	/*
-	const TEST_URLS = [
-      "https://www.llportal.vn/favicon.ico",     // favicon thường cho phép tải
-      "http://30.126.84.39:8071/favicon.ico"      // thay bằng ảnh nếu có
-    ];
 
-    function checkImageLoad(url) {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => resolve(true);     // truy cập được
-        img.onerror = () => resolve(false);   // không truy cập được
-        img.src = url + "?rand=" + Math.random();  // tránh cache
-      });
-    }
-
-    async function main() {
-      const results = await Promise.all(TEST_URLS.map(checkImageLoad));
-      const accessible = results.some(r => r === true); // nếu truy cập được ít nhất 1
-
-      const statusEl = document.getElementById("status");
-
-      if (accessible) {
-        //statusEl.textContent = "⛔️ Đang dùng mạng công ty/VPN – KHÔNG cho phép tiếp tục.";
-        //statusEl.style.color = "red";
-		document.body.innerHTML = "<h2>⛔️ Đang dùng mạng công ty/VPN – KHÔNG cho phép tiếp tục.</h2>";
-      } else {
-        //statusEl.textContent = "✅ Không truy cập được mạng công ty – Cho phép tiếp tục.";
-        //statusEl.style.color = "green";
-
-        // 👉 Gọi xử lý tiếp theo ở đây nếu cần
-        // runMainApp();
-      }
-    }
-	
-	setInterval(main, 10000);
-	*/
 	
 	function checkURL() {
 	
