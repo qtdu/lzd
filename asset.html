@@ -145,8 +145,8 @@
 		<div id="qr-reader"></div>
 	  </div>
 	  <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-		  <select id="camera-select"></select>
-		  <button onclick="startScanner()">Bắt đầu quét</button>
+		  <select id="camera-select" style="width: 68vw"></select>
+		  <button onclick="startScanner()" style="width: 30vw">Bắt đầu quét</button>
 		</div>
       <textarea id="result" placeholder="Các mã đã quét..."></textarea>
       <button id="sendData" class="sendData" onclick="sendData()">Gửi</button>
@@ -204,27 +204,26 @@
 
     // Lấy danh sách camera và đổ vào select
     Html5Qrcode.getCameras().then(devices => {
-      const select = document.getElementById("camera-select");
-      devices.forEach(device => {
-        const option = document.createElement("option");
-        option.value = device.id;
-        option.text = device.label || `Camera ${select.length + 1}`;
-        select.appendChild(option);
-      });
-    }).catch(err => {
-      alert("Không tìm thấy camera nào: " + err);
-    });
+	  const select = document.getElementById("camera-select");
+	  select.innerHTML = ""; // Xóa dòng đang tải
 
-    function startScanner() {
-      if (qrScanner) {
-        qrScanner.stop().then(() => {
-          qrScanner.clear();
-          runScanner();
-        });
-      } else {
-        runScanner();
-      }
-    }
+	  if (devices.length === 0) {
+		const option = document.createElement("option");
+		option.text = "Không tìm thấy camera nào";
+		option.disabled = true;
+		select.appendChild(option);
+		return;
+	  }
+
+	  devices.forEach(device => {
+		const option = document.createElement("option");
+		option.value = device.id;
+		option.text = device.label || `Camera ${select.length + 1}`;
+		select.appendChild(option);
+	  });
+	}).catch(err => {
+	  alert("Lỗi khi truy cập camera: " + err);
+	});
 
     function runScanner() {
       cameraId = document.getElementById("camera-select").value;
