@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>QR Scanner (no import)</title>
+  <style>
+    video {
+      width: 100%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h2>Quét QR Code</h2>
+  <video id="video" autoplay muted playsinline></video>
+  <p id="result">Đang quét...</p>
+
+  <!-- Nạp thư viện và worker -->
+  <script src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
+  <script>
+    QrScanner.WORKER_PATH = 'https://unpkg.com/qr-scanner@1.4.2/qr-scanner-worker.min.js';
+
+    const videoElem = document.getElementById('video');
+    const resultElem = document.getElementById('result');
+
+    const scanner = new QrScanner(videoElem, result => {
+      resultElem.textContent = "✅ " + result;
+      scanner.stop(); // Tự dừng sau khi quét thành công
+    });
+
+    scanner.start();
+  </script>
+</body>
+</html>
