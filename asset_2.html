@@ -233,16 +233,21 @@
 
     const scanner = new QrScanner(videoElem, result => {
       const text = typeof result === 'string' ? result : result.data || String(result);
-      if (!scannedSet.has(text)) {
-        scannedSet.add(text);
-        resultArea.value += text + "\n";
-        soundSuccess.play();
-      } else {
-        soundDuplicate.play();
-      }
+      if (regex.test(text)) {
+		  if (!scannedSet.has(text)) {
+			scannedSet.add(text);
+			resultArea.value = text + "\n" + resultArea.value;
+			soundSuccess.play();
+			if (window.navigator.vibrate) {
+				window.navigator.vibrate(100);
+			}
+		  } else {
+			soundDuplicate.play();
+		  }
+	  }
     }, {
       highlightScanRegion: true,
-      maxScansPerSecond: 5
+      maxScansPerSecond: 15
     });
 
     scanner.start();
