@@ -2,31 +2,52 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>QR Scanner (no import)</title>
+  <title>QR Scanner liên tục</title>
   <style>
-    video {
+    body {
+      text-align: center;
+      font-family: sans-serif;
+    }
+
+    #video {
       width: 100%;
-      max-width: 400px;
-      border: 1px solid #ccc;
+      max-width: 360px;
+      height: auto;
+      border: 4px solid #4CAF50;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+
+    textarea {
+      margin-top: 20px;
+      width: 90%;
+      height: 200px;
+      font-size: 1.2rem;
     }
   </style>
 </head>
 <body>
-  <h2>Quét QR Code</h2>
+  <h2>📷 Quét QR liên tục</h2>
   <video id="video" autoplay muted playsinline></video>
-  <p id="result">Đang quét...</p>
+  <textarea id="resultArea" placeholder="Kết quả sẽ hiển thị ở đây..."></textarea>
 
-  <!-- Nạp thư viện và worker -->
+  <!-- QR Scanner script -->
   <script src="https://unpkg.com/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
   <script>
     QrScanner.WORKER_PATH = 'https://unpkg.com/qr-scanner@1.4.2/qr-scanner-worker.min.js';
 
     const videoElem = document.getElementById('video');
-    const resultElem = document.getElementById('result');
+    const resultArea = document.getElementById('resultArea');
+    const scannedList = new Set(); // để tránh trùng lặp
 
     const scanner = new QrScanner(videoElem, result => {
-      resultElem.textContent = "✅ " + result;
-      scanner.stop(); // Tự dừng sau khi quét thành công
+      if (!scannedList.has(result)) {
+        scannedList.add(result);
+        resultArea.value += result + "\n";
+      }
+    }, {
+      highlightScanRegion: true,
+      maxScansPerSecond: 5
     });
 
     scanner.start();
