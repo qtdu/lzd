@@ -1,0 +1,32 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Supabase Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <h2>Test Supabase Load</h2>
+  <pre id="output">Loading...</pre>
+
+  <script>
+    const supabaseUrl = "https://charzimogystpbkwruhv.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoYXJ6aW1vZ3lzdHBia3dydWh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg3NjY3MjEsImV4cCI6MjA2NDM0MjcyMX0.xHnjaI-29Z-DReEFBHRuAZsPtY419Yk5rKDNcCorrrs";
+	const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    async function testLoad() {
+      const { data, error } = await supabase
+        .from("quangtest")
+        .select("*");
+
+      document.getElementById("output").textContent = error
+        ? "❌ Error: " + error.message
+        : JSON.stringify(data, null, 2);
+    }
+
+    testLoad();
+  </script>
+</body>
+</html>
